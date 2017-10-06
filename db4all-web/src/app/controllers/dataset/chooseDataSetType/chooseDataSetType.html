@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h3 class="modal-title">New DataSet</h3>
+</div>
+<div class="modal-body">
+
+
+  <div class="row" ng-show="chooseDataSetType.page === 1">
+    <div class="col-sm-offset-1 col-sm-5">
+      <a ng-click="chooseDataSetType.wrangleDataSet()" class="thumbnail" style="cursor: pointer;">
+        <img src="../../../assets/images/tables.png" style="padding:20px">
+        <div class="caption">
+          <h4>Wrangle DataSet</h4>
+          <p>Manipulate tables to build new dataset</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-sm-5">
+      <a ng-click="chooseDataSetType.fileDataSet()" class="thumbnail"  style="cursor: pointer;">
+        <img src="../../../assets/images/upload.png" style="padding:20px">
+        <div class="caption">
+          <h4>File DataSet</h4>
+          <p>Upload your file to create a new dataset</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="row" ng-show="chooseDataSetType.page === 2">
+    <form style="padding:10px;" ng-submit="chooseDataSetType.ok()">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputDatabase" class="control-label">Database</label>
+            <input class="form-control" id="inputDatabase" placeholder="" ng-model="chooseDataSetType.database" disabled>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputTableName" class="control-label">Table Name</label>
+            <input class="form-control" id="inputTableName" placeholder="" ng-model="chooseDataSetType.name" autofocus ng-focus="true">
+          </div>
+        </div>
+      </div>
+      <div class="row" ng-show="chooseDataSetType.showTableAlreadyExistError">
+        <div class="col-sm-12">
+          <div uib-alert class="alert-danger">This table already exists. Please choose another name.</div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="chooseDataSetType.ok()" ng-show="chooseDataSetType.page === 2" ng-disabled="chooseDataSetType.loading">
+    <span ng-show="chooseDataSetType.loading" class="fa fa-spinner fa-spin" style="color: inherit;"></span> OK
+  </button>
+  <button class="btn btn-default" type="button" ng-click="chooseDataSetType.cancel()">Cancel</button>
+</div>

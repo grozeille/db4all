@@ -1,0 +1,68 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<div class="container-fluid" style="padding-top:20px;">
+
+  <div class="row" style="margin-bottom:20px;">
+
+    <div class="col-md-12">
+
+      <div class="input-group" >
+        <span class="input-group-addon" id="catalog-filter"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+        <input ng-model="catalog.sourceFilter" type="text" class="form-control" placeholder="Search" aria-describedby="catalog-filter">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-sm-3">
+
+      <div class="panel panel-default" >
+        <div class="panel-heading" >
+        </div>
+        <div class="panel-body" style="height:360px; overflow: hidden;">
+          <a ui-sref="tableEditor({database: '', table: ''})" ><img style="display:block;margin-left:auto;margin-right:auto;margin-top:80px;cursor: pointer;" src="../../assets/images/plus-outline-gray.png"/></a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-sm-3" ng-repeat="table in catalog.tables | filter:catalog.sourceFilter | orderBy:'-access'">
+
+      <div class="panel panel-default" >
+        <div class="panel-heading" >
+        </div>
+        <div class="panel-body" style="height:300px; overflow: hidden;">
+          <p><b>Database:</b> {{table.database}}</p>
+          <p><b>Table:</b> {{table.table}}</p>
+          <p><b>Path:</b> {{table.path}}</p>
+          <br/>
+          <p><b>Format:</b> {{table.format}}</p>
+          <p><b>Data Domain Owner:</b> <a href="mailto:{{table.creator}}">{{table.creator}}</a></p>
+          <p><b>Comment:</b><br/><span ng-bind-html="table.comment"></span></p>
+          <p><b>Tags:</b><br/>
+            <span ng-repeat="tag in table.tags"><span class="label label-primary">{{tag}}</span>&nbsp;</span>
+          </p>
+      </div>
+      <div class="panel-body" style="height:60px;">
+        <a ng-if="table.dataSetType == 'user_file'" ng-click="catalog.delete(table.database, table.table)" class="btn btn-danger btn-sm pull-right" style="margin-left:10px;" aria-label="Left Align">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete
+        </a>
+        <a ng-if="table.dataSetType == 'user_file'" ng-click="catalog.edit(table.database, table.table)" class="btn btn-info btn-sm pull-right" style="margin-left:10px;" aria-label="Left Align">
+          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit
+        </a>
+      </div>
+
+
+    </div>
+  </div>
+
+
+</div>
+
+
+<!-- END : main-container -->
+

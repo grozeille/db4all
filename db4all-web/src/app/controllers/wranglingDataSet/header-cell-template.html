@@ -1,0 +1,61 @@
+<div
+  role="columnheader"
+  ng-class="{ 'sortable': sortable, 'selected': grid.appScope.isColumnSelected(col)  }"
+  ui-grid-one-bind-aria-labelledby-grid="col.uid + '-header-text ' + col.uid + '-sortdir-text'"
+  aria-sort="{{col.sort.direction == asc ? 'ascending' : ( col.sort.direction == desc ? 'descending' : (!col.sort.direction ? 'none' : 'other'))}}">
+
+  <!--
+  Don't use ng-focus & ng-blur because we have ng-blur when we try to manipulate the column
+  -->
+  <div
+    role="button"
+    ng-click="grid.appScope.selectColumn(col);"
+    tabindex="0"
+    class="ui-grid-cell-contents ui-grid-header-cell-primary-focus"
+    col-index="renderIndex"
+    title="TOOLTIP">
+    <span
+      class="ui-grid-header-cell-label"
+      ui-grid-one-bind-id-grid="col.uid + '-header-text'">
+      {{ col.colDef.hive.column.newName CUSTOM_FILTERS }}
+    </span>
+    <div ng-if="!col.colDef.hive.column.isCalculated">
+      <span ng-switch on="col.colDef.hive.column.newType">
+        <i ng-switch-when="String" class="fa" aria-hidden="true">abc</i>
+        <i ng-switch-when="Numeric Integer" class="fa" aria-hidden="true">123</i>
+        <i ng-switch-when="Numeric Float" class="fa" aria-hidden="true">1.23</i>
+        <i ng-switch-when="Date" class="fa fa-calendar-o" aria-hidden="true"></i>
+        <i ng-switch-when="Date and Time" class="fa fa-clock-o" aria-hidden="true"></i>
+        <i ng-switch-when="Boolean" class="fa fa-check-square-o" aria-hidden="true"></i>
+        <i ng-switch-default class="fa"></i>
+      </span>
+
+      <br/>
+      <span style="font-weight: normal;">
+        min: {{ col.colDef.hive.column.statistics.min }}
+      </span>
+      <br/>
+      <span style="font-weight: normal;">
+        max: {{ col.colDef.hive.column.statistics.max }}
+      </span>
+      <br/>
+      <span style="font-weight: normal;">
+        count: {{ col.colDef.hive.column.statistics.count }}
+      </span>
+    </div>
+
+    <div ng-if="col.colDef.hive.column.isCalculated">
+      <br/>
+      <span style="font-weight: normal;">
+        <i>calculated</i>
+      </span>
+      <br/>
+      <br/>
+      <br/>
+    </div>
+
+  </div>
+
+
+  <div ui-grid-filter></div>
+</div>

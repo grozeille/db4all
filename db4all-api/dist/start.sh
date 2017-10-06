@@ -1,0 +1,1 @@
+java -Dloader.path=file://./etc -jar datalake-toolbox-*.jar

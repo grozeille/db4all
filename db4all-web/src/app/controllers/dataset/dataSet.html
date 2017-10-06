@@ -1,0 +1,77 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<script type="text/ng-template" id="delete.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Confirm delete ?</h3>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to delete the view {{delete.dataSetName}} ?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="delete.ok()">OK</button>
+    <button class="btn btn-default" type="button" ng-click="delete.cancel()">Cancel</button>
+  </div>
+</script>
+
+<div class="container-fluid page-container" style="padding-top:20px;">
+
+  <div class="row" style="margin-bottom:20px;">
+    <form ng-submit="dataset.loadAllDataSet()">
+      <div class="col-md-12">
+
+        <div class="input-group" >
+          <span class="input-group-addon" id="catalog-filter"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+          <input ng-model="dataset.sourceFilter" type="text" class="form-control" placeholder="Search" aria-describedby="view-filter">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-3">
+
+      <div class="panel panel-default" >
+        <div class="panel-body" style="height:378px; overflow: hidden;">
+          <a ng-click="dataset.createNewDataSet()" ><img style="display:block;margin-left:auto;margin-right:auto;margin-top:80px;cursor: pointer;" src="../../assets/images/plus-outline-gray.png"/></a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-3" ng-repeat="d in dataset.dataSetList">
+
+      <dataset-card item="d">
+        <a ng-show="d.showEditionButtons" ng-click="dataset.deleteDataSet(d.database, d.table)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
+          <span class="glyphicon glyphicon-remove"></span> Delete
+        </a>
+        <a ng-show="d.showEditionButtons" ng-click="dataset.cloneDataSet(d.database, d.table)" type="button" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
+          <span class="glyphicon glyphicon-duplicate"></span> Clone
+        </a>
+        <a ng-show="d.showEditionButtons" ng-click="dataset.editDataSet(d.database, d.table)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="d.editLoading">
+          <span ng-show="!d.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="d.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Edit
+        </a>
+        <a ng-click="dataset.viewDataSet(d.database, d.table)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="d.viewLoading">
+          <span ng-show="!d.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="d.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> View
+        </a>
+      </dataset-card>
+
+    </div>
+
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="text-center">
+        <ul uib-pagination items-per-page="dataset.itemsPerPage" total-items="dataset.pageResult.totalElements" ng-model="dataset.currentPage" ng-change="dataset.loadAllDataSet()"></ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- END : main-container -->
+
+</div>

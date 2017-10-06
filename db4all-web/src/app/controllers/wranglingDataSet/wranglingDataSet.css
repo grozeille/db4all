@@ -1,0 +1,50 @@
+.gridSample  .ui-grid-header-cell {
+  /*height: 40px;*/
+}
+
+.gridSample  .ui-grid-row:nth-child(even) .ui-grid-cell {
+	background-color: #fff;
+}
+
+.gridSample  .ui-grid-cell {
+	border: 1px solid #f3f3f3;
+}
+
+.ui-grid-header-cell .selected {
+  background-color: #bfcfdc;
+}
+
+.panel .fa {
+  font-size: 16px;
+  color: steelblue;
+}
+
+.tab-box {
+  margin-bottom:0px;
+}
+
+.panel-default {
+  border-radius: 0px;
+}
+
+.panel-editor-tab {
+  /*margin-top:-15px;*/
+  border-top-style: none;
+}
+
+.nav-tabs > li {
+  /*margin-bottom: 12px;*/
+}
+
+.panel-title {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.panel-title > a {
+  text-decoration: none;
+}
+
+.ace_editor {
+  height: 140px;
+}

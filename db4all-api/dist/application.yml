@@ -1,0 +1,53 @@
+server:
+  port: 9000
+
+logging.level.org.hibernate.SQL: debug
+logging.level.org.apache.hadoop.yarn.util.RackResolver: warn
+
+
+multipart:
+    enabled: true
+    max-file-size: 500Mb
+    max-request-size: 550Mb
+
+spring:
+  jackson.serialization.write_dates_as_timestamps: false
+  h2.console.enabled: true
+  jpa:
+    database: H2
+    hibernate:
+      ddl-auto: none
+  datasource:
+    primary:
+        url: jdbc:h2:./database/db
+        username: sa
+        password:
+        driver-class-name: org.h2.Driver
+    hive:
+        url: jdbc:hive2://localhost:10000/default
+        username: hive
+        driver-class-name: org.apache.hive.jdbc.HiveDriver
+        maximumPoolSize: 1
+
+datalake:
+  toolbox:
+    solr:
+      embedded: true
+      home: ./solr-home
+      zkUrl:
+
+
+security:
+  oauth2:
+    sso:
+      loginPath: /login
+    client:
+      clientId:
+      clientSecret:
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user

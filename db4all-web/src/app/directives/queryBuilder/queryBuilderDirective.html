@@ -1,0 +1,33 @@
+<div class="query-group">
+    <div class="form-inline query-header-form">
+        <select ng-options="o.name as o.name for o in operators" ng-model="group.operator" class="form-control input-sm" style="padding-right: 30px; padding-top:0px;"></select>
+        <button style="margin-left: 5px" ng-click="addCondition()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Condition</button>
+        <button style="margin-left: 5px" ng-click="addGroup()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Group</button>
+        <button style="margin-left: 5px" ng-click="removeGroup()" ng-show="removeVisible" class="btn btn-sm btn-danger btn-sm"><span class="glyphicon glyphicon-minus-sign"></span> Remove Group</button>
+    </div>
+    <div class="query-group-conditions">
+        <div ng-repeat="rule in group.rules | orderBy:'index'" class="query-condition">
+            <div ng-switch="rule.hasOwnProperty('group')">
+                <div ng-switch-when="true">
+                    <query-builder group="rule.group" fields="fields" remove-visible="aaaaa"></query-builder>
+                </div>
+                <div ng-switch-default="ng-switch-default">
+                    <div class="form-inline query-condition-form">
+
+
+                          <ui-select ng-model="rule.field"  style="width:300px;float: left;">
+                            <ui-select-match placeholder="Select in the list...">{{$select.selected.name}}</ui-select-match>
+                            <ui-select-choices repeat="item in fields | filter: $select.search" group-by="'groupName'">
+                              <div ng-bind-html="item.name | highlight: $select.search"></div>
+                            </ui-select-choices>
+                          </ui-select>
+
+                        <select style="margin-left: 5px; padding-right: 30px;padding-top:0px;" ng-options="c.name as c.name for c in conditions" ng-model="rule.condition" class="form-control input-sm"></select>
+                        <input style="margin-left: 5px;width:300px;" type="text" ng-model="rule.data" class="form-control input-sm" ng-hide="isArgVisible(rule.condition)" placeholder="{{help(rule.condition)}}"/>
+                        <button style="margin-left: 5px;" ng-click="removeCondition($index)" class="btn btn-sm btn-danger btn-sm"><span class="glyphicon glyphicon-minus-sign"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

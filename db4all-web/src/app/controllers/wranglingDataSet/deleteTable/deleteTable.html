@@ -1,0 +1,12 @@
+<div class="modal-header">
+  <h3 class="modal-title">Confirm remove</h3>
+</div>
+<div class="modal-body">
+  Do you confirm to remove the table [{{deleteTable.table.database}}.{{deleteTable.table.table}}] ?
+  <br/>
+  This action cannot be undone, all changes on related columns will be deleted.
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="deleteTable.ok()">OK</button>
+  <button class="btn btn-default" type="button" ng-click="deleteTable.cancel()">Cancel</button>
+</div>

@@ -1,0 +1,69 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<div class="container-fluid" style="padding-top:20px;">
+
+  <alerts-popup alerts="setup.alerts"></alerts-popup>
+
+
+
+  <div class="row" style="margin-bottom:20px;">
+
+    <div class="col-sm-12">
+
+
+      <div class="row fill-height-substract">
+
+        <div class="col-sm-12">
+          <div class="panel panel-default panel-editor-tab" style="height: auto;">
+            <div class="panel-body">
+
+              <fieldset>
+                <form style="padding: 0px;">
+
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <div class="alert alert-info" role="alert">
+                        You are here because you want to setup the first admin account. <br/>
+                        You should have the adminToken from your configuration file on your server.<br/>
+                        If you already are an administrator, please use the <a ui-sref="admin">admin page</a> to manage administrators.
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="adminToken" class="control-label">Admin Token</label>
+                        <input class="form-control" id="adminToken" placeholder="" ng-model="setup.adminToken">
+                      </div>
+                    </div>
+
+                    <div class="col-sm-4" style="padding-top:25px">
+                      <a id="save" type="button" class="btn btn-primary" ng-click="setup.save()">
+                        <span class="glyphicon glyphicon-save"></span> Save
+                      </a>
+
+                    </div>
+
+                  </div>
+                </form>
+              </fieldset>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- END : main-container -->
+

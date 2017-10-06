@@ -1,0 +1,35 @@
+.dataset-card-header {
+  height:47px;
+}
+
+.dataset-card-header-orange {
+  background-image: url("../../assets/images/back-blue.jpg");
+  background-size:cover;
+}
+
+.dataset-card-header-blue {
+  background-image: url("../../assets/images/back-orange.jpg");
+  background-size:cover;
+}
+
+.dataset-card-header-green {
+  background-image: url("../../assets/images/back-green.jpg");
+  background-size:cover;
+}
+
+.dataset-card-title {
+  font-size:26px;
+  font-weight: 200;
+}
+
+.dataset-card-body {
+  height:290px;
+  overflow: hidden;
+}
+
+.dataset-card-footer {
+  display: table;
+  width: 100%;
+  height: 41px;
+  padding: 5px 5px;
+}

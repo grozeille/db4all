@@ -1,0 +1,54 @@
+<div class="modal-header">
+  <h3 class="modal-title">Clone DataSet</h3>
+</div>
+<div class="modal-body">
+
+  <div class="row">
+    <form style="padding:10px;" ng-submit="cloneDataSet.ok()">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputSourceDatabase" class="control-label">Source Database</label>
+            <input class="form-control" id="inputSourceDatabase" placeholder="" ng-model="cloneDataSet.sourceDatabase" disabled>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputSourceTableName" class="control-label">Source Table Name</label>
+            <input class="form-control" id="inputSourceTableName" placeholder="" ng-model="cloneDataSet.sourceTable" disabled>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputDatabase" class="control-label">Target Database</label>
+            <input class="form-control" id="inputDatabase" placeholder="" ng-model="cloneDataSet.database" disabled>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="inputTableName" class="control-label">Target Table Name</label>
+            <input class="form-control" id="inputTableName" placeholder="" ng-model="cloneDataSet.name" autofocus ng-focus="true">
+          </div>
+        </div>
+      </div>
+      <div class="row" ng-show="cloneDataSet.showTableAlreadyExistError">
+        <div class="col-sm-12">
+          <div uib-alert class="alert-danger">This table already exists. Please choose another name.</div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+<div class="modal-footer">
+  <a type="button" class="btn btn-primary" type="button" ng-click="cloneDataSet.ok()" ng-disabled="cloneDataSet.cloning">
+    <span ng-show="cloneDataSet.cloning" class="fa fa-spinner fa-spin" style="color: inherit;"></span> OK
+  </a>
+  <button class="btn btn-default" type="button" ng-click="cloneDataSet.cancel()">Cancel</button>
+</div>

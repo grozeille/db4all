@@ -1,0 +1,54 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<div class="container-fluid" style="padding-top:20px;">
+
+  <div class="row" style="margin-bottom:20px;">
+
+    <div class="col-md-1">
+      <button type="button" class="btn btn-primary" aria-label="Left Align" ui-sref="wranglingDataSet">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+      </button>
+    </div>
+
+    <form ng-submit="wranglingDataSetTableSelection.loadAllDataSet()">
+      <div class="col-md-11">
+
+        <div class="input-group" >
+          <span class="input-group-addon" id="catalog-filter"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+          <input ng-model="wranglingDataSetTableSelection.sourceFilter" type="text" class="form-control" placeholder="Search" aria-describedby="view-filter">
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-sm-3" ng-repeat="d in wranglingDataSetTableSelection.dataSetList">
+
+      <dataset-card item="d">
+        <button ng-click="wranglingDataSetTableSelection.selectTable(d.database, d.table)" type="button" class="btn btn-success btn-sm pull-right" aria-label="Left Align">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+        </button>
+      </dataset-card>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="text-center">
+        <ul uib-pagination items-per-page="wranglingDataSetTableSelection.itemsPerPage" total-items="wranglingDataSetTableSelection.pageResult.totalElements" ng-model="wranglingDataSetTableSelection.currentPage" ng-change="wranglingDataSetTableSelection.loadAllDataSet()"></ul>
+      </div>
+    </div>
+  </div>
+
+
+  </div>
+
+
+<!-- END : main-container -->
+
+</div>

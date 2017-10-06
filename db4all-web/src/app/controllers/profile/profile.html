@@ -1,0 +1,91 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<div class="container-fluid" style="padding-top:20px;">
+
+  <alerts-popup alerts="profile.alerts"></alerts-popup>
+
+  <div class="row fill-height-substract">
+
+    <div class="col-sm-3">
+
+    </div>
+    <div class="col-sm-9">
+
+      <div class="form-group" style="height:34px;"> <!-- fix height because pull-right doesn't allow to auto-calculate -->
+        <a type="button" class="btn btn-primary pull-right" ng-click="profile.save()">
+          <span class="glyphicon glyphicon-save"></span> Save
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom:20px;">
+
+    <div class="col-md-12">
+      <div class="panel panel-default panel-editor-tab" style="height: auto;">
+        <div class="panel-body">
+
+          <fieldset>
+            <legend>Information</legend>
+
+            <form style="padding: 0px;">
+
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="currentLogin" class="control-label">Current Login</label>
+                    <input class="form-control" id="currentLogin" placeholder="" ng-model="profile.currentProfile.login" disabled>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </fieldset>
+
+          <fieldset>
+            <legend>Preferences</legend>
+
+            <form style="padding: 0px;">
+
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="selectedProject" class="control-label">Current project Name</label>
+                    <select class="form-control" id="selectedProject" style="font-family: FontAwesome, sans-serif;"
+                            ng-options="item as item.name for item in profile.memberProjects track by item.id"
+                            ng-model="profile.selectedProject">
+                      </select>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="projectDatabase" class="control-label">Hive Database</label>
+                    <input class="form-control" id="projectDatabase" placeholder="" ng-model="profile.selectedProject.hiveDatabase" disabled>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="projectHdfsPath" class="control-label">HDFS Working Directory</label>
+                    <input class="form-control" id="projectHdfsPath" placeholder="" ng-model="profile.selectedProject.hdfsWorkingDirectory" disabled>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </fieldset>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- END : main-container -->
+

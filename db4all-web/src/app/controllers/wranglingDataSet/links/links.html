@@ -1,0 +1,97 @@
+<div class="modal-header" style="margin-bottom:30px;">
+  <h3 class="modal-title">Manage links <img src="../../../assets/images/link-help.png" class="pull-right"/></h3>
+  <p>Connect your table with others, from left to right.<br/>
+  Link type: could be <b>inner</b> or <b>outer</b>.
+  <ul>
+    <li>Inner: the left row will be removed if no row exist in thr right side</li>
+    <li>Outer: the left row will remain if no row exist in thr right side (values of right side will be empty)</li>
+  </ul>
+  </p>
+</div>
+<div class="modal-body">
+
+  <!-- Display all links from the left table to the rights -->
+  <div class="row" style="margin-bottom:10px;" ng-repeat="link in links.links">
+
+    <!-- Left table -->
+    <div class="col-sm-5" style="padding-right:0px;">
+      <div class="panel panel-default">
+        <div class="panel-heading" >
+          <div class="row">
+            <div class="col-sm-2" style="padding-top:7px;padding-bottom:7px;">
+              <span class="glyphicon glyphicon-th-large"></span>
+            </div>
+            <div class="col-sm-10">
+              <!--<input class="form-control" value="{{link.table.left.label}}" disabled />-->
+              <div style="padding-top:5px;">{{link.table.left.label}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body" >
+          <p ng-repeat="column in link.columns">
+            <select class="form-control" ng-model="column.left" ng-options="item as item.label for item in links.leftTable.columns track by item.id">
+            </select>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Join -->
+    <div class="col-sm-2" style="padding-top:13px;">
+      <p style="margin-bottom: 0px;">
+        <select class="form-control" ng-model="link.type">
+          <option>inner</option>
+          <option>outer</option>
+        </select>
+      </p>
+      <p style="margin-right:-12px;margin-left:-12px;margin-bottom: 4px;"><img ng-if="link.type" ng-src="{{links.loadLinkImage(link.type)}}" style="width:100%;"></p>
+      <p ng-repeat="column in link.columns" style="height:34px;">
+        <button type="button" class="btn btn-success" style="width:100%;" ng-click="links.addColumn($parent.$parent.$index)" ng-if="$last" ng-disabled="links.isAddDisabled($parent.$parent.$index)" >
+          <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span> Add
+        </button>
+      </p>
+    </div>
+
+    <!-- Right table -->
+    <div class="col-sm-5" style="padding-left:0px;">
+      <div class="panel panel-default">
+        <div class="panel-heading" >
+          <div class="row">
+            <div class="col-sm-2" style="padding-top:7px;">
+              <span class="glyphicon glyphicon-th-large"></span>
+            </div>
+            <div class="col-sm-10">
+              <select class="form-control" ng-model="link.table.right" ng-options="item as item.label for item in links.rightTableList track by item.id" ng-change="links.refreshColumns($index)">
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div ng-repeat="column in link.columns" style="position:relative;float:left;margin-bottom:10px;width:100%;">
+            <div style="width:75%;position: relative;float:left;">
+              <select class="form-control" ng-model="column.right" ng-options="item as item.label for item in link.table.right.columns track by item.id">
+              </select>
+            </div>
+            <div style="width:25%;position: relative;float:left;padding-left:10px;">
+              <button type="button" class="btn btn-danger" ng-click="links.removeColumn($parent.$index, $index)">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Be able to add a new link to a table -->
+  <button type="button" class="btn btn-success" ng-click="links.addLink()" >
+    <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span> Add new link
+  </button>
+
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="links.manageLinksOK()">OK</button>
+  <button class="btn btn-default" type="button" ng-click="links.manageLinksCancel()">Cancel</button>
+</div>

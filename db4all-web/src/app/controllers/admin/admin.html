@@ -1,0 +1,245 @@
+<div ui-view>
+  <navbar/>
+</div>
+
+<script type="text/ng-template" id="deleteAdmin.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Confirm delete ?</h3>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to remove from administrators {{delete.login}} ?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="delete.ok()">OK</button>
+    <button class="btn btn-default" type="button" ng-click="delete.cancel()">Cancel</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="deleteProject.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Confirm delete ?</h3>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to delete the project {{delete.project.name}} ?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="delete.ok()">OK</button>
+    <button class="btn btn-default" type="button" ng-click="delete.cancel()">Cancel</button>
+  </div>
+</script>
+
+<div class="container-fluid" style="padding-top:20px;">
+
+  <alerts-popup alerts="admin.alerts"></alerts-popup>
+
+  <div class="row" style="margin-bottom:20px;" ng-show="!admin.showPage">
+
+    <div class="col-sm-12">
+
+
+      <div class="row fill-height-substract">
+
+        <div class="col-sm-12">
+          <div class="panel panel-default panel-editor-tab" style="height: auto;">
+            <div class="panel-body">
+
+              <fieldset>
+
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <div class="alert alert-info" role="alert">
+                        You are not administrator.
+                      </div>
+                    </div>
+                  </div>
+
+              </fieldset>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom:20px;" ng-show="admin.showPage">
+
+    <div class="col-sm-12">
+      <uib-tabset active="0">
+        <uib-tab index="0" heading="Administrators">
+
+          <div class="panel panel-default panel-editor-tab">
+            <div class="panel-body">
+
+              <fieldset>
+                <form style="padding: 0px;">
+
+
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="newLogin" class="control-label">New administartor</label>
+                        <input class="form-control" id="newLogin" placeholder="" ng-model="admin.newLogin">
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <a id="saveNewAdmin" type="button" class="btn btn-primary" ng-click="admin.addAdmin()">
+                        <span class="glyphicon glyphicon-plus"></span> Add
+                      </a>
+
+                    </div>
+                  </div>
+
+                </form>
+
+                <div class="row" style="padding-top:25px">
+                  <div class="col-sm-12">
+                    <table class="table table-hover ">
+                      <thead>
+                      <tr><th>Login</th><th></th></tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="adminUser in admin.adminUsers">
+                          <td>{{adminUser.login}}</td>
+                          <td><a type="button" class="btn btn-danger" ng-click="admin.removeAdmin(adminUser.login)">
+                            <span class="glyphicon glyphicon-minus"></span> Remove
+                          </a></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+              </fieldset>
+
+            </div>
+          </div>
+
+        </uib-tab>
+
+        <uib-tab index="1" heading="Projects">
+
+          <div class="panel panel-default panel-editor-tab" style="min-height: 220px;">
+            <div class="panel-body">
+
+              <fieldset>
+                <form style="padding: 0px;">
+
+
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="newProject" class="control-label">New project</label>
+                        <input class="form-control" id="newProject" placeholder="" ng-model="admin.newProject.name">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="newProjectDatabase" class="control-label">Hive Database</label>
+                        <input class="form-control" id="newProjectDatabase" placeholder="" ng-model="admin.newProject.hiveDatabase">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="newProjectHdfsPath" class="control-label">HDFS Working Directory</label>
+                        <input class="form-control" id="newProjectHdfsPath" placeholder="" ng-model="admin.newProject.hdfsWorkingDirectory">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <a id="saveProject" type="button" class="btn btn-primary" ng-click="admin.addProject()">
+                        <span class="glyphicon glyphicon-plus"></span> Add
+                      </a>
+                    </div>
+                  </div>
+
+                </form>
+
+                <div class="row" style="padding-top:25px">
+                  <div class="col-sm-12">
+                    <table class="table table-hover ">
+                      <thead>
+                      <tr><th>Projects</th><th></th></tr>
+                      </thead>
+                      <tbody>
+                      <tr ng-repeat="project in admin.projects">
+                        <td><a ui-sref="project({id: project.id})">{{project.name}}</a></td>
+                        <td><a type="button" class="btn btn-danger" ng-click="admin.removeProject(project.id)">
+                          <span class="glyphicon glyphicon-minus"></span> Remove
+                        </a></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+              </fieldset>
+
+            </div>
+          </div>
+
+        </uib-tab>
+
+        <uib-tab index="2" heading="Datasets">
+
+          <div class="panel panel-default panel-editor-tab" style="min-height: 220px;">
+            <div class="panel-body">
+
+              <fieldset>
+                <form style="padding: 0px;">
+
+
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="publicDataSetRegex" class="control-label">Public dataset regex</label>
+                        <input class="form-control" id="publicDataSetRegex" placeholder="" ng-model="admin.dataset.regex">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="publicDataSetCron" class="control-label">Public dataset cron</label>
+                        <input class="form-control" id="publicDataSetCron" placeholder="" ng-model="admin.dataset.cron">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <a id="refreshDataSet" type="button" class="btn btn-primary" ng-click="admin.refreshDataSet()">
+                        <span class="glyphicon glyphicon-refresh"></span> Refresh
+                      </a>
+                    </div>
+                  </div>
+
+                </form>
+
+              </fieldset>
+
+            </div>
+          </div>
+
+        </uib-tab>
+
+      </uib-tabset>
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- END : main-container -->
+

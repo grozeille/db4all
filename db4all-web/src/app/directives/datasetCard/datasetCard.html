@@ -1,0 +1,17 @@
+<div class="panel panel-default" >
+  <div class="panel-header dataset-card-header" ng-class="item.headerClass">
+  </div>
+  <div class="panel-body dataset-card-body" class="dataset-card-body">
+    <p class="dataset-card-title">{{item.database}}<br/>
+      <span uib-tooltip="{{item.table}}">{{item.table | limitTo: 20 }}{{ item.table.length > 20 ? '...' : ''}}</span></p>
+    <p style="color:#737373;"><span ng-bind-html="item.comment"></span></p>
+    <br/>
+    <p><b>Format:</b> {{item.format}}</p>
+    <p><b>Owner:</b> <a href="mailto:{{item.creator}}">{{item.creator}}</a></p>
+    <p><span ng-repeat="tag in item.tags"><span class="label label-primary">{{tag}}</span>&nbsp;</span>
+    </p>
+  </div>
+  <div class="panel-footer dataset-card-footer">
+    <ng-transclude></ng-transclude>
+  </div>
+</div>
