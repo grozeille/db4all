@@ -35,7 +35,11 @@ public class InternalAuthenticationListener implements ApplicationListener<Inter
         user.setLastLogin(triggerTime);
 
         // keep a trace of the authentication
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Unable to save the authenticated user: "+user.getLogin());
+        }
     }
 
 }

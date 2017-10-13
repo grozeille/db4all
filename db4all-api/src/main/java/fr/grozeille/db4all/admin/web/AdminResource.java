@@ -40,7 +40,7 @@ public class AdminResource {
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/{login}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> add(@PathVariable("login") String login) {
+    public ResponseEntity<Void> add(@PathVariable("login") String login) throws Exception {
 
         User user = userRepository.findOne(login);
         if(user == null) {
@@ -55,7 +55,7 @@ public class AdminResource {
     @RequestMapping(value = "/current-user", method = RequestMethod.POST)
     public ResponseEntity<AdminWithTokenResponse> addWithAdminToken(
             @RequestBody AdminWithTokenRequest request,
-            @ApiIgnore @ApiParam(hidden = true)  Principal principal) {
+            @ApiIgnore @ApiParam(hidden = true)  Principal principal) throws Exception {
 
         if(clusterConfiguration.getAdminToken().contentEquals(request.getAdminToken())) {
             this.adminUserRepository.save(new AdminUser(principal.getName()));

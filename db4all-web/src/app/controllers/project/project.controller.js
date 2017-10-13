@@ -7,63 +7,37 @@ module.exports = {
 };
 
 /** @ngInject */
-function ProjectController($log, $uibModal, $stateParams, projectService) {
+function ProjectController($timeout, $log, $location, $filter, $uibModal, $state, projectService) {
   var vm = this;
 
-  vm.alerts = [];
-
-  vm.projectId = $stateParams.id;
-  vm.project = {
-    name: '',
-    hiveDatabase: '',
-    hdfsWorkingDirectory: '',
-    members: []
+  vm.sourceFilter = '';
+  vm.projectList = [];
+  vm.pageResult = {
+    totalElements: 0,
+    totalPages: 0,
+    last: true,
+    first: true
   };
-  vm.newMember = '';
+  vm.currentPage = 1;
+  vm.itemsPerPage = 11;
 
-  vm.refresh = function() {
-    projectService.getById(vm.projectId)
-      .then(function(data) {
-        vm.project = data;
-      })
-      .catch(function(error) {
-        vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
-        throw error;
-      });
+  vm.createNewProject = function() {
   };
 
-  vm.addMember = function() {
-    for(var index = 0; index < vm.project.members.length; index++) {
-      if(vm.project.members[index].login === vm.newMember) {
-        return;
-      }
-    }
-    vm.project.members.push({login: vm.newMember});
-    vm.newMember = '';
-  };
-
-  vm.removeMember = function(login) {
-    for(var index = 0; index < vm.project.members.length; index++) {
-      if(vm.project.members[index].login === login) {
-        vm.project.members.splice(index, 1);
-        return;
-      }
-    }
-  };
-
-  vm.save = function() {
-    projectService.save(vm.project)
-      .then(function() {
-        vm.alerts.push({msg: 'Project saved.', type: 'info'});
-      })
-      .catch(function(error) {
-        vm.alerts.push({msg: 'Unable to save project ' + vm.projectId + '.', type: 'danger'});
-        throw error;
-      });
+  vm.loadAllProjects = function() {
+    projectService.getAllProject(vm.sourceFilter, vm.currentPage - 1, vm.itemsPerPage).then(function(data) {
+      vm.projectList = data.content;
+      vm.pageResult = {
+        totalElements: data.totalElements,
+        last: data.last,
+        first: data.first,
+        totalPages: data.totalPages
+      };
+    });
   };
 
   function activate() {
-    vm.refresh();
+    vm.loadAllProjects();
   }
 
   activate();

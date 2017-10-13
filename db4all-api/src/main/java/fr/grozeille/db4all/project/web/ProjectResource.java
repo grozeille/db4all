@@ -2,59 +2,95 @@ package fr.grozeille.db4all.project.web;
 
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
-import fr.grozeille.db4all.project.web.dto.NewProjectRequest;
+import fr.grozeille.db4all.project.services.ProjectService;
+import fr.grozeille.db4all.project.web.dto.ProjectCreationRequest;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.UUID;
+import java.util.Arrays;
 
 @RestController
 @Slf4j
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/project")
 public class ProjectResource {
 
     @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+                    value = "Results page you want to retrieve (0..N)"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                    value = "Number of records per page."),
+            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+                    value = "Sorting criteria in the format: property(,asc|desc). " +
+                            "Default sort order is ascending. " +
+                            "Multiple sort criteria are supported.")
+    })
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Iterable<Project> getAll() {
-        return this.projectRepository.findAll();
+    public Page<Project> filter(
+            Pageable pageable,
+            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
+
+        return projectService.findAll(pageable, filter, "");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Project get(@PathVariable("id") String id) {
-        return this.projectRepository.findOne(id);
-    }
+    public ResponseEntity<Project> get(@PathVariable("id") String id) {
+        Project result = this.projectRepository.findOne(id);
+        if(result == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> put(@PathVariable("id") String id, @RequestBody Project project) {
-        this.projectRepository.save(project);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(result);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Void> add(@RequestBody NewProjectRequest request) {
-        Project project = new Project();
-        project.setId(UUID.randomUUID().toString());
-        project.setName(request.getName());
-        project.setHiveDatabase(request.getHiveDatabase());
-        project.setHdfsWorkingDirectory(request.getHdfsWorkingDirectory());
-        project = this.projectRepository.save(project);
+    public ResponseEntity<Void> create(@RequestBody ProjectCreationRequest request) throws Exception {
+        Project project = this.projectService.create(new Project(
+                null,
+                request.getName(),
+                request.getComment(),
+                request.getTags(),
+                Arrays.asList(new String[0])
+        ));
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
+                .fromCurrentRequest().path("/api/project/{id}")
                 .buildAndExpand(project.getId()).toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody Project project) throws Exception {
+
+        if(!project.getId().equals(id)){
+            return ResponseEntity.badRequest().build();
+        }
+
+        Project result = this.projectRepository.findOne(id);
+        if(result == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        projectService.update(project);
+
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

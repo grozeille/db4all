@@ -1,26 +1,22 @@
 package fr.grozeille.db4all.configurations;
 
 import fr.grozeille.db4all.ClusterConfiguration;
-import fr.grozeille.db4all.configurations.stereotype.JpaRepository;
-import fr.grozeille.db4all.configurations.stereotype.SolrRepository;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
+import fr.grozeille.db4all.entity.repositories.EntitySearchItemRepository;
+import fr.grozeille.db4all.project.repositories.ProjectSearchItemRepository;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean;
+import org.springframework.data.hadoop.hbase.HbaseTemplate;
 import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.repository.config.EnableSolrRepositories;
-import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
+import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
 import org.springframework.web.client.RestTemplate;
 import org.xml.sax.SAXException;
 
@@ -31,8 +27,7 @@ import java.io.IOException;
 
 //import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 
-@EnableSolrRepositories(includeFilters = @ComponentScan.Filter(SolrRepository.class), basePackages = "fr.grozeille.db4all")
-@EnableJpaRepositories(includeFilters = @ComponentScan.Filter(JpaRepository.class), basePackages = "fr.grozeille.db4all")
+//@EnableSolrRepositories()
 @Configuration
 public class ApplicationConfiguration {
 
@@ -51,27 +46,60 @@ public class ApplicationConfiguration {
         return new RestTemplate();
     }
 
-    @Bean
-    @Primary
-    @ConfigurationProperties(prefix="spring.datasource.primary")
-    public DataSource primaryDataSource() {
-        return DataSourceBuilder.create().build();
+    @Bean SolrClient solrProjectClient() throws ParserConfigurationException, SAXException, IOException {
+        CloudSolrClient client = new CloudSolrClient(clusterConfiguration().getSolr().getZkUrl());
+        client.setDefaultCollection("project");
+        return client;
+    }
+
+    @Bean SolrClient solrEntityClient() throws ParserConfigurationException, SAXException, IOException {
+        CloudSolrClient client = new CloudSolrClient(clusterConfiguration().getSolr().getZkUrl());
+        client.setDefaultCollection("entity");
+        return client;
+    }
+
+    @Bean(name = "solrProjectTemplate")
+    public SolrOperations solrProjectTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrProjectClient());
+    }
+
+    @Bean(name = "solrEntityTemplate")
+    public SolrOperations solrEntityTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrEntityClient());
     }
 
     @Bean
-    public SolrClient solrServer() throws IOException, SAXException, ParserConfigurationException {
-        ClusterConfiguration configuration = clusterConfiguration();
-        if(configuration.getSolr().isEmbedded()) {
-            EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory(configuration.getSolr().getHome());
-            return factory.getSolrClient();
-        }
-        else {
-            return new CloudSolrClient(configuration.getSolr().getZkUrl());
-        }
+    public EntitySearchItemRepository entitySearchItemRepository() throws IOException, SAXException, ParserConfigurationException {
+        return new SolrRepositoryFactory(this.solrEntityTemplate()).getRepository(EntitySearchItemRepository.class);
     }
 
     @Bean
-    public SolrOperations solrTemplate() throws ParserConfigurationException, SAXException, IOException {
-        return new SolrTemplate(solrServer());
+    public ProjectSearchItemRepository projectSearchItemRepository() throws IOException, SAXException, ParserConfigurationException {
+        return new SolrRepositoryFactory(this.solrProjectTemplate()).getRepository(ProjectSearchItemRepository.class);
+    }
+
+    @Bean
+    public org.apache.hadoop.conf.Configuration configuration(){
+        return new org.apache.hadoop.conf.Configuration();
+    }
+
+    @Bean
+    public HbaseConfigurationFactoryBean hbaseConfigurationFactory(){
+        String zkUrl = clusterConfiguration().getHbase().getZkUrl();
+        HbaseConfigurationFactoryBean conf = new HbaseConfigurationFactoryBean();
+        conf.setZkQuorum(zkUrl.split(":")[0]);
+        conf.setZkPort(Integer.parseInt(zkUrl.split(":")[1]));
+
+        return conf;
+    }
+
+    @Bean
+    public HBaseAdmin hbaseAdmin() throws IOException {
+        return new HBaseAdmin(hbaseConfigurationFactory().getObject());
+    }
+
+    @Bean
+    public HbaseTemplate hbaseTemplate() {
+        return new HbaseTemplate(hbaseConfigurationFactory().getObject());
     }
 }

@@ -14,8 +14,8 @@ function projectService($log, $http, $location, $filter, $q, $rootScope) {
     throw error;
   };
 
-  function getAllProjects() {
-    var url = vm.apiHost + '/project';
+  function getAllProjects(filter, page, size) {
+    var url = vm.apiHost + '/project?filter=' + filter + '&page=' + page + '&size=' + size;
 
     return $http.get(url).then(vm.getServiceData).catch(vm.catchServiceException);
   }

@@ -8,5 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ClusterConfiguration {
     private ClusterSolrConfiguration solr;
 
+    private ClusterHBaseConfiguration hbase;
+
     private String adminToken;
 }

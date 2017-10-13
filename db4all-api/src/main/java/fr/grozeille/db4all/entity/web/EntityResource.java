@@ -1,45 +1,37 @@
 package fr.grozeille.db4all.entity.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import fr.grozeille.db4all.entity.model.Entity;
-import fr.grozeille.db4all.entity.model.EntitySearchItem;
-import fr.grozeille.db4all.entity.repositories.DataSetRepository;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
-import fr.grozeille.scuba.dataset.model.DataSetConf;
-import fr.grozeille.scuba.dataset.model.DataSetSearchItem;
-import fr.grozeille.scuba.dataset.model.HiveTable;
-import fr.grozeille.scuba.dataset.repositories.DataSetRepository;
-import fr.grozeille.scuba.dataset.services.DataSetService;
-import fr.grozeille.scuba.dataset.web.dto.DataSetData;
-import fr.grozeille.scuba.dataset.web.dto.DataSetRequest;
+import fr.grozeille.db4all.entity.services.EntityService;
+import fr.grozeille.db4all.project.model.Project;
+import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
-import java.security.Principal;
-import java.util.Collection;
+import java.net.URI;
 
 @RestController
 @Slf4j
 @RequestMapping("/api/entity")
 public class EntityResource {
 
-    private static final String DEFAULT_MAX = "50000";
+    @Autowired
+    private EntityService entityService;
 
     @Autowired
     private EntityRepository entityRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -52,11 +44,11 @@ public class EntityResource {
                             "Multiple sort criteria are supported.")
     })
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Iterable<Entity> filter(
+    public Page<Entity> filter(
             Pageable pageable,
-            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) {
+            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
 
-        return internalFilter(pageable, filter, "");
+        return entityService.findAll(pageable, filter, "");
     }
 
     @ApiImplicitParams({
@@ -70,46 +62,78 @@ public class EntityResource {
                             "Multiple sort criteria are supported.")
     })
     @RequestMapping(value = "/{project}", method = RequestMethod.GET)
-    public Iterable<Entity> filter(
+    public Page<Entity> filter(
             Pageable pageable,
             @PathVariable("project") String project,
-            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) {
+            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
 
-        return internalFilter(pageable, filter, project);
+        return entityService.findAll(pageable, filter, project);
     }
 
     @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.GET)
     public ResponseEntity<Entity> get(@PathVariable("project") String project,
-                                         @PathVariable("entity") String entity) throws IOException {
-        return null;
+                                      @PathVariable("entity") String entity) throws IOException {
+        Entity result = entityRepository.findOne(project, entity);
+        return ResponseEntity.ok(result);
+    }
+
+    @RequestMapping(value = "/{project}", method = RequestMethod.POST)
+    public ResponseEntity<?> create(
+            @PathVariable("project") String project,
+            @RequestBody Entity request) throws Exception {
+
+        Project result = this.projectRepository.findOne(project);
+        if(result == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        Entity createdEntity = entityService.create(project, request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/api/entity/{project}/{entity}")
+                .buildAndExpand(project, createdEntity.getId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.PUT)
+    public ResponseEntity<Void> update(
+            @PathVariable("project") String project,
+            @PathVariable("entity") String entity,
+            @RequestBody Entity entityItem) throws Exception {
+
+        if(!entityItem.getId().equals(entity)){
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        entityService.update(project, entityItem);
+
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.DELETE)
-    public void delete(
+    public ResponseEntity<Void> delete(
             @PathVariable("project") String project,
             @PathVariable("entity") String entity) throws Exception {
 
-    }
-
-    private Iterable<Entity> internalFilter(Pageable pageable, String filter, String project) {
-        if(pageable.getSort() == null) {
-            pageable = new PageRequest(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    new Sort(Sort.Direction.ASC, "project", "name"));
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.notFound().build();
         }
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-        Page<EntitySearchItem> result;
-        result = entityRepository.findAllAndProject(pageable, filter, "");
+        entityService.delete(project, entity);
 
-        return result.map(dataSetSearchItem -> {
-            try {
-                return objectMapper.readValue(dataSetSearchItem.getJsonData(), Entity.class);
-            } catch (IOException e) {
-                log.error("Unable to read json data: "+ dataSetSearchItem.getJsonData());
-                return null;
-            }
-        });
+        return ResponseEntity.ok().build();
+    }
+
+    private boolean checkEntityExists(String project, String entity) {
+        Entity result = entityRepository.findOne(project, entity);
+        if(result == null){
+            return true;
+        }
+        return false;
     }
 }

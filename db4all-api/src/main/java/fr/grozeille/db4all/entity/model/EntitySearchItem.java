@@ -19,8 +19,14 @@ public class EntitySearchItem {
     private String text;
 
     @Field
+    private String projectName;
+
+    @Field
     private String name;
 
     @Field
-    private String jsonData;
+    private String[] tags;
+
+    @Field
+    private String comment;
 }

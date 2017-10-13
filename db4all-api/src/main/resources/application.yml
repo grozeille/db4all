@@ -7,29 +7,18 @@ logging.level.org.apache.hadoop.yarn.util.RackResolver: warn
 
 spring:
   jackson.serialization.write_dates_as_timestamps: false
-  h2.console.enabled: true
-  jpa:
-    database: H2
-    hibernate:
-      ddl-auto: none
-  datasource:
-    primary:
-        url: jdbc:h2:./target/database/db
-        username: sa
-        password:
-        driver-class-name: org.h2.Driver
   http:
     multipart:
-        enabled: true
-        max-file-size: 500Mb
-        max-request-size: 550Mb
+      enabled: true
+      max-file-size: 500Mb
+      max-request-size: 550Mb
 
 db4all:
   adminToken: e5e68d89adc641b2946b6c770c4fd7c7e23f278e
   solr:
-    embedded: true
-    home: ./target/solr-home
-    zkUrl:
+    zkUrl: localhost:9983
+  hbase:
+    zkUrl: localhost:2181
 
 
 security:

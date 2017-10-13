@@ -10,17 +10,20 @@ function navbar($compile) {
     return function(scope, element, attrs) {
       scope.menu = {
         left: [{
-          name: 'DataSets',
-          state: 'dataset'
-        }/* , {
-          name: 'Cubes',
-          state: ''
-        } */],
+          name: 'Projets',
+          state: 'project'
+        }, {
+          name: 'Entités',
+          state: 'entity'
+        }, {
+          name: 'Filtres',
+          state: 'filter'
+        }],
         right: [{
-          name: 'Admin',
+          name: 'Administration',
           state: 'admin'
         }, {
-          name: 'Profile',
+          name: 'Profil',
           state: 'profile'
         }]
       };
