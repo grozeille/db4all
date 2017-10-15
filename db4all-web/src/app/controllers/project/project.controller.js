@@ -22,10 +22,15 @@ function ProjectController($timeout, $log, $location, $filter, $uibModal, $state
   vm.itemsPerPage = 11;
 
   vm.createNewProject = function() {
+    $state.go('projectDetail', {id: ''});
+  };
+
+  vm.editProject = function(id) {
+    $state.go('projectDetail', {id: id});
   };
 
   vm.loadAllProjects = function() {
-    projectService.getAllProject(vm.sourceFilter, vm.currentPage - 1, vm.itemsPerPage).then(function(data) {
+    projectService.getAllProjects(vm.sourceFilter, vm.currentPage - 1, vm.itemsPerPage).then(function(data) {
       vm.projectList = data.content;
       vm.pageResult = {
         totalElements: data.totalElements,
@@ -33,6 +38,10 @@ function ProjectController($timeout, $log, $location, $filter, $uibModal, $state
         first: data.first,
         totalPages: data.totalPages
       };
+      for(var cpt = 0; cpt < vm.projectList.length; cpt++) {
+        vm.projectList[cpt].editLoading = false;
+        vm.projectList[cpt].viewLoading = false;
+      }
     });
   };
 

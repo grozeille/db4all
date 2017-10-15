@@ -8,4 +8,5 @@ angular.module('datalakeToolbox')
   .directive('fillHeight', require('./fillHeight/fillHeight.directive'))
   .directive('navbar', require('./navbar/navbar.directive'))
   .directive('alertsPopup', require('./alertsPopup/alertsPopup.directive'))
-  .directive('datasetCard', require('./datasetCard/datasetCard.directive'));
+  .directive('datasetCard', require('./datasetCard/datasetCard.directive'))
+  .directive('projectCard', require('./projectCard/projectCard.directive'));

@@ -271,9 +271,9 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
         if(idField != null){
             idField.set(object, id);
         }
-        //else if(idProp != null){
-        idProp.getWriteMethod().invoke(object, id);
-        //}
+        else if(idProp != null){
+            idProp.getWriteMethod().invoke(object, id);
+        }
     }
 
 

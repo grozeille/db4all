@@ -2,18 +2,23 @@
   height:47px;
 }
 
-.project-card-header-orange {
+.project-card-header-blue {
   background-image: url("../../assets/images/back-blue.jpg");
   background-size:cover;
 }
 
-.project-card-header-blue {
+.project-card-header-orange {
   background-image: url("../../assets/images/back-orange.jpg");
   background-size:cover;
 }
 
 .project-card-header-green {
   background-image: url("../../assets/images/back-green.jpg");
+  background-size:cover;
+}
+
+.project-card-header-gray {
+  background-image: url("../../assets/images/back-gray.jpg");
   background-size:cover;
 }
 

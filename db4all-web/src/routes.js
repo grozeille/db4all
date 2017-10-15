@@ -36,10 +36,14 @@ function routesConfig($stateProvider, $urlRouterProvider) {
       component: 'setupControllerComponent'
     })
     .state('project', {
-      url: '/project/:id',
+      url: '/project',
       component: 'projectControllerComponent'
+    })
+    .state('projectDetail', {
+      url: '/projectDetail/:id',
+      component: 'projectDetailControllerComponent'
     })
     ;
 
-  $urlRouterProvider.otherwise('/dataset');
+  $urlRouterProvider.otherwise('/project');
 }

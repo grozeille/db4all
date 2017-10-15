@@ -55,8 +55,8 @@ public class ProjectResource {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Void> create(@RequestBody ProjectCreationRequest request) throws Exception {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Project> create(@RequestBody ProjectCreationRequest request) throws Exception {
         Project project = this.projectRepository.save(new Project(
                 null,
                 request.getName(),
@@ -69,24 +69,24 @@ public class ProjectResource {
                 .fromCurrentRequest().path("/api/project/{id}")
                 .buildAndExpand(project.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(project);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody Project project) throws Exception {
+    public ResponseEntity<Project> update(@PathVariable("id") String id, @RequestBody Project project) throws Exception {
 
         if(!project.getId().equals(id)){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null);
         }
 
         Project result = this.projectRepository.findOne(id);
         if(result == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         projectRepository.save(project);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(project);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

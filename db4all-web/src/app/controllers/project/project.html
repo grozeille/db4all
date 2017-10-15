@@ -23,7 +23,7 @@
 
         <div class="input-group" >
           <span class="input-group-addon" id="catalog-filter"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-          <input ng-model="project.sourceFilter" type="text" class="form-control" placeholder="Search" aria-describedby="view-filter">
+          <input ng-model="project.sourceFilter" type="text" class="form-control" placeholder="Filtrer" aria-describedby="view-filter">
         </div>
       </div>
     </form>
@@ -45,13 +45,13 @@
 
       <project-card item="p">
         <a ng-click="project.deleteProject(p.id)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
-          <span class="glyphicon glyphicon-remove"></span> Delete
+          <span class="glyphicon glyphicon-remove"></span> Supprimer
         </a>
-        <a ng-show="p.showEditionButtons" ng-click="project.editDataSet(p.database, p.table)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.editLoading">
-          <span ng-show="!p.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="p.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Edit
+        <a ng-click="project.editProject(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.editLoading">
+          <span ng-show="!p.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="p.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Editer
         </a>
-        <a ng-click="project.viewDataSet(p.database, p.table)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.viewLoading">
-          <span ng-show="!p.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="p.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> View
+        <a ng-click="project.viewProject(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.viewLoading">
+          <span ng-show="!p.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="p.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Consulter
         </a>
       </project-card>
 
@@ -63,7 +63,15 @@
   <div class="row">
     <div class="col-md-12">
       <div class="text-center">
-        <ul uib-pagination items-per-page="project.itemsPerPage" total-items="project.pageResult.totalElements" ng-model="project.currentPage" ng-change="project.loadAllDataSet()"></ul>
+        <ul uib-pagination
+            items-per-page="project.itemsPerPage"
+            total-items="project.pageResult.totalElements"
+            ng-model="project.currentPage"
+            ng-change="project.loadAllProjects()"
+            first-text="Début"
+            previous-text="Précédent"
+            last-text="Find"
+            next-text="Suivant"></ul>
       </div>
     </div>
   </div>

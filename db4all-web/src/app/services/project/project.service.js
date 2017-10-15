@@ -27,9 +27,16 @@ function projectService($log, $http, $location, $filter, $q, $rootScope) {
   }
 
   function save(project) {
-    var url = vm.apiHost + '/project/' + project.id;
+    if(project.id) {
+      var putUrl = vm.apiHost + '/project/' + project.id;
 
-    return $http.put(url, project).catch(vm.catchServiceException);
+      return $http.put(putUrl, project).catch(vm.catchServiceException);
+    }
+    else {
+      var postUrl = vm.apiHost + '/project';
+
+      return $http.post(postUrl, project).catch(vm.catchServiceException);
+    }
   }
 
   function remove(id) {

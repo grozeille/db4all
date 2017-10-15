@@ -163,8 +163,8 @@ public abstract class HBaseWithSolrJsonDataRepository<T, I> extends HBaseJsonDat
         if(idSearchField != null){
             idSearchField.set(object, id);
         }
-        //else if(idProp != null){
-        idSearchProp.getWriteMethod().invoke(object, id);
-        //}
+        else if(idSearchProp != null){
+            idSearchProp.getWriteMethod().invoke(object, id);
+        }
     }
 }

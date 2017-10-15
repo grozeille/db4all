@@ -1,63 +1,61 @@
-require('./project.css');
+require('./projectDetail.css');
 
 module.exports = {
-  controller: ProjectController,
-  controllerAs: 'project',
-  template: require('./project.html')
+  controller: ProjectDetailController,
+  controllerAs: 'projectDetail',
+  template: require('./projectDetail.html')
 };
 
 /** @ngInject */
-function ProjectController($log, $uibModal, $stateParams, projectService) {
+function ProjectDetailController($log, $uibModal, $stateParams, projectService) {
   var vm = this;
 
   vm.alerts = [];
 
   vm.projectId = $stateParams.id;
   vm.project = {
+    id: '',
     name: '',
-    hiveDatabase: '',
-    hdfsWorkingDirectory: '',
-    members: []
+    comment: ''
   };
-  vm.newMember = '';
+  vm.tags = [];
 
   vm.refresh = function() {
-    projectService.getById(vm.projectId)
-      .then(function(data) {
-        vm.project = data;
-      })
-      .catch(function(error) {
-        vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
-        throw error;
-      });
-  };
-
-  vm.addMember = function() {
-    for(var index = 0; index < vm.project.members.length; index++) {
-      if(vm.project.members[index].login === vm.newMember) {
-        return;
-      }
-    }
-    vm.project.members.push({login: vm.newMember});
-    vm.newMember = '';
-  };
-
-  vm.removeMember = function(login) {
-    for(var index = 0; index < vm.project.members.length; index++) {
-      if(vm.project.members[index].login === login) {
-        vm.project.members.splice(index, 1);
-        return;
-      }
+    if(vm.projectId !== '') {
+      projectService.getById(vm.projectId)
+        .then(function(data) {
+          vm.project = data;
+          vm.tags = [];
+          for(var cpt = 0; cpt < vm.project.tags.length; cpt++) {
+            vm.tags.push({text: vm.project.tags[cpt]});
+          }
+        })
+        .catch(function(error) {
+          vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
+          throw error;
+        });
     }
   };
 
   vm.save = function() {
+    vm.project.tags = [];
+    for(var cpt = 0; cpt < vm.tags.length; cpt++) {
+      vm.project.tags.push(vm.tags[cpt].text);
+    }
+
     projectService.save(vm.project)
-      .then(function() {
+      .then(function(request) {
+        vm.projectId = request.data.id;
+        vm.project = request.data;
         vm.alerts.push({msg: 'Project saved.', type: 'info'});
       })
       .catch(function(error) {
-        vm.alerts.push({msg: 'Unable to save project ' + vm.projectId + '.', type: 'danger'});
+        if(vm.projectId) {
+          vm.alerts.push({msg: 'Unable to save project ' + vm.projectId + '.', type: 'danger'});
+        }
+        else {
+          vm.alerts.push({msg: 'Unable to save new project.', type: 'danger'});
+        }
         throw error;
       });
   };
