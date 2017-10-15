@@ -21,12 +21,53 @@ function ProjectController($timeout, $log, $location, $filter, $uibModal, $state
   vm.currentPage = 1;
   vm.itemsPerPage = 11;
 
+  function getProject(id) {
+    var result = null;
+    for(var cpt = 0; cpt < vm.projectList.length; cpt++) {
+      if(vm.projectList[cpt].id === id) {
+        result = vm.projectList[cpt];
+        break;
+      }
+    }
+    return result;
+  }
+
   vm.createNewProject = function() {
     $state.go('projectDetail', {id: ''});
   };
 
   vm.editProject = function(id) {
     $state.go('projectDetail', {id: id});
+  };
+
+  vm.deleteProject = function(id) {
+    var project = getProject(id);
+
+    $uibModal.open({
+      templateUrl: 'delete.html',
+      controllerAs: 'delete',
+      controller: function($uibModalInstance, projectName, parent) {
+        var vm = this;
+        vm.projectName = projectName;
+        vm.ok = function() {
+          projectService.remove(id).then(function() {
+            $uibModalInstance.close();
+            parent.loadAllProjects();
+          });
+        };
+        vm.cancel = function() {
+          $uibModalInstance.dismiss('cancel');
+        };
+      },
+      resolve: {
+        projectName: function () {
+          return project.name;
+        },
+        parent: function() {
+          return vm;
+        }
+      }
+    });
   };
 
   vm.loadAllProjects = function() {

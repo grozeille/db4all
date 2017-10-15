@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.base.Strings;
 import fr.grozeille.db4all.project.model.Project;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.HColumnDescriptor;
@@ -103,12 +104,12 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
     public <S extends T> S save(S entity) {
         byte[] data = new byte[0];
         try {
-            data = objectMapper.writeValueAsBytes(entity);
             String id = this.getId(entity);
-            if(id == null){
+            if(Strings.isNullOrEmpty(id)){
                 id = UUID.randomUUID().toString();
                 this.setId(entity, id);
             }
+            data = objectMapper.writeValueAsBytes(entity);
             hbaseTemplate.put(tableName, id, cfInfo, colData, data);
             return entity;
         } catch (JsonProcessingException e) {
@@ -119,7 +120,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
             log.error("Unable to get Id", e);
         }
 
-        return null;
+        return entity;
     }
 
     @Override
