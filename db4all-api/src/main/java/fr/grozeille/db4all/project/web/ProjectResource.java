@@ -2,7 +2,6 @@ package fr.grozeille.db4all.project.web;
 
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
-import fr.grozeille.db4all.project.services.ProjectService;
 import fr.grozeille.db4all.project.web.dto.ProjectCreationRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -25,9 +24,6 @@ import java.util.Arrays;
 public class ProjectResource {
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
     private ProjectRepository projectRepository;
 
     @ApiImplicitParams({
@@ -45,7 +41,7 @@ public class ProjectResource {
             Pageable pageable,
             @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
 
-        return projectService.findAll(pageable, filter, "");
+        return projectRepository.findAll(pageable, filter);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -61,7 +57,7 @@ public class ProjectResource {
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> create(@RequestBody ProjectCreationRequest request) throws Exception {
-        Project project = this.projectService.create(new Project(
+        Project project = this.projectRepository.save(new Project(
                 null,
                 request.getName(),
                 request.getComment(),
@@ -88,7 +84,7 @@ public class ProjectResource {
             return ResponseEntity.notFound().build();
         }
 
-        projectService.update(project);
+        projectRepository.save(project);
 
         return ResponseEntity.ok().build();
     }

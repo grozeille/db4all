@@ -1,65 +1,76 @@
 package fr.grozeille.db4all.project.repositories;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import fr.grozeille.db4all.configurations.HBaseWithSolrJsonDataRepository;
 import fr.grozeille.db4all.project.model.Project;
-import fr.grozeille.db4all.user.model.User;
+import fr.grozeille.db4all.project.model.ProjectSearchItem;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.HTableInterface;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.commons.collections.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.hbase.HbaseTemplate;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 @Component
-public class ProjectRepository {
+public class ProjectRepository extends HBaseWithSolrJsonDataRepository<Project, ProjectSearchItem> {
+
+    private final ProjectSearchItemRepository projectSearchItemRepository;
+
     @Autowired
-    private HbaseTemplate hbaseTemplate;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final String tableName = "projects";
-
-    private final String cfInfo = "cfInfo";
-
-    private final String colData = "data";
-
-    public Project findOne(String id) {
-        return hbaseTemplate.get(tableName, id, cfInfo, colData, (r,n) -> r.value() == null ? null : objectMapper.readValue(r.value(), Project.class));
+    public ProjectRepository(ProjectSearchItemRepository projectSearchItemRepository) throws IntrospectionException, InvalidClassException {
+        super(Project.class, "projects", projectSearchItemRepository, ProjectSearchItem.class);
+        this.projectSearchItemRepository = projectSearchItemRepository;
     }
 
-    public void save(Project project) throws Exception {
-        byte[] data = objectMapper.writeValueAsBytes(project);
-        hbaseTemplate.put(tableName, project.getId(), cfInfo, colData, data);
+    @Override
+    public Page<Project> findAll(Pageable pageable) {
+        pageable = getOrDefaultPageable(pageable);
+        return super.findAll(pageable);
     }
 
-    public void delete(String id) {
-        hbaseTemplate.delete(tableName, id, cfInfo);
-    }
+    public Page<Project> findAll(Pageable pageable, String filter) throws IOException {
+        pageable = getOrDefaultPageable(pageable);
 
-    public Iterable<Project> findAll(Iterable<String> ids) throws IOException {
-        return hbaseTemplate.execute(tableName, table -> {
-            List<Get> queryRowList = new ArrayList<>();
-            for(String id : ids) {
-                queryRowList.add(new Get(Bytes.toBytes(id)));
+        if(Strings.isNullOrEmpty(filter)){
+            return this.findAll(pageable);
+        }
+        else {
+            Page<ProjectSearchItem> result = this.projectSearchItemRepository.findAll(pageable, filter);
+            List<String> id = new ArrayList<>();
+            for(ProjectSearchItem i : result){
+                id.add(i.getId());
             }
-            Result[] results = table.get(queryRowList);
-            return Arrays.stream(results).map(result -> {
-                try {
-                    return result.value() == null ? null : objectMapper.readValue(result.value(), Project.class);
-                } catch (IOException e) {
-                    log.error("Unable to read JSON for "+new String(result.getRow()));
-                    return null;
-                }
-            })::iterator;
-        });
+            Iterable<Project> all = this.findAll(id);
+            return new PageImpl<>(Lists.newArrayList(all.iterator()), pageable, result.getTotalElements());
+        }
     }
+
+    @Override
+    protected ProjectSearchItem toSearchItem(Project project) {
+        ProjectSearchItem searchItem = new ProjectSearchItem();
+        searchItem.setId(project.getId());
+        searchItem.setName(project.getName());
+        searchItem.setComment(project.getComment());
+        searchItem.setTags(project.getTags());
+        return searchItem;
+    }
+
+    private Pageable getOrDefaultPageable(Pageable pageable) {
+        if(pageable.getSort() == null) {
+            pageable = new PageRequest(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    new Sort(Sort.Direction.ASC, "name"));
+        }
+        return pageable;
+    }
+
 }

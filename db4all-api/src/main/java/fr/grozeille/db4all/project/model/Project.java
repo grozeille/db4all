@@ -3,6 +3,7 @@ package fr.grozeille.db4all.project.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Project {
+
+    @Id
     private String id;
 
     private String name;

@@ -1,8 +1,9 @@
 package fr.grozeille.db4all.entity.web;
 
+import com.google.common.base.Strings;
 import fr.grozeille.db4all.entity.model.Entity;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
-import fr.grozeille.db4all.entity.services.EntityService;
+import fr.grozeille.db4all.entity.web.dto.EntityCreationRequest;
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import io.swagger.annotations.ApiImplicitParam;
@@ -25,9 +26,6 @@ import java.net.URI;
 public class EntityResource {
 
     @Autowired
-    private EntityService entityService;
-
-    @Autowired
     private EntityRepository entityRepository;
 
     @Autowired
@@ -48,7 +46,7 @@ public class EntityResource {
             Pageable pageable,
             @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
 
-        return entityService.findAll(pageable, filter, "");
+        return entityRepository.findAll(pageable, filter);
     }
 
     @ApiImplicitParams({
@@ -67,7 +65,7 @@ public class EntityResource {
             @PathVariable("project") String project,
             @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
 
-        return entityService.findAll(pageable, filter, project);
+        return entityRepository.findAllByProject(pageable, filter, project);
     }
 
     @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.GET)
@@ -80,14 +78,18 @@ public class EntityResource {
     @RequestMapping(value = "/{project}", method = RequestMethod.POST)
     public ResponseEntity<?> create(
             @PathVariable("project") String project,
-            @RequestBody Entity request) throws Exception {
+            @RequestBody EntityCreationRequest request) throws Exception {
 
         Project result = this.projectRepository.findOne(project);
         if(result == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        Entity createdEntity = entityService.create(project, request);
+        Entity createdEntity = entityRepository.save(project, new Entity(
+                null,
+                request.getName(),
+                request.getComment(),
+                request.getTags()));
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/entity/{project}/{entity}")
@@ -102,7 +104,7 @@ public class EntityResource {
             @PathVariable("entity") String entity,
             @RequestBody Entity entityItem) throws Exception {
 
-        if(!entityItem.getId().equals(entity)){
+        if(!entity.equals(entityItem.getId())){
             return ResponseEntity.badRequest().build();
         }
 
@@ -110,7 +112,7 @@ public class EntityResource {
             return ResponseEntity.notFound().build();
         }
 
-        entityService.update(project, entityItem);
+        entityRepository.save(project, entityItem);
 
         return ResponseEntity.ok().build();
     }
@@ -124,7 +126,7 @@ public class EntityResource {
             return ResponseEntity.notFound().build();
         }
 
-        entityService.delete(project, entity);
+        entityRepository.delete(project, entity);
 
         return ResponseEntity.ok().build();
     }

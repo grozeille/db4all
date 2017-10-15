@@ -11,5 +11,8 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 public interface EntitySearchItemRepository extends SolrCrudRepository<EntitySearchItem, String> {
 
     @Query(value = "text:'?0' AND projectName:'?1'")
-    Page<EntitySearchItem> findAllAndProject(Pageable pageable, String filter, String projectName);
+    Page<EntitySearchItem> findAllByProject(Pageable pageable, String filter, String projectName);
+
+    @Query(value = "text:'?0'")
+    Page<EntitySearchItem> findAll(Pageable pageable, String filter);
 }
