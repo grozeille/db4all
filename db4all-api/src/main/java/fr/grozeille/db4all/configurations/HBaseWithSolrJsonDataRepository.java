@@ -134,10 +134,8 @@ public abstract class HBaseWithSolrJsonDataRepository<T, I> extends HBaseJsonDat
             try {
                 String id = getId(e);
                 this.solrRepository.delete(id);
-            } catch (IllegalAccessException e1) {
-                log.error("Unable to get Id", e);
-            } catch (InvocationTargetException e1) {
-                log.error("Unable to get Id", e);
+            } catch (IllegalAccessException | InvocationTargetException e1) {
+                log.error("Unable to get Id", e1);
             }
 
         }

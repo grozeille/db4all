@@ -12,6 +12,7 @@ import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.model.ProjectSearchItem;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -22,10 +23,7 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -52,7 +50,7 @@ public class EntityRepository {
     }
 
     public Entity findOne(String project, String id) {
-        return hbaseTemplate.get(tableName, project, cfEntities, id, (r, n) -> map(r));
+        return hbaseTemplate.get(tableName, project, cfEntities, id, (r, n) -> map(r, id));
     }
 
     public Entity save(String projectId, Entity entity) throws Exception {
@@ -76,48 +74,92 @@ public class EntityRepository {
         this.entitySearchItemRepository.delete(id);
     }
 
-    public Iterable<Entity> findAll(Iterable<String> ids) throws IOException {
+    public Iterable<Entity> findAll(String projectId, Iterable<String> ids) throws IOException {
         return hbaseTemplate.execute(tableName, table -> {
-            List<Get> queryRowList = new ArrayList<>();
+            Get get = new Get(Bytes.toBytes(projectId));
             for(String id : ids) {
-                queryRowList.add(new Get(Bytes.toBytes(id)));
+                get.addColumn(Bytes.toBytes(cfEntities), Bytes.toBytes(id));
             }
-            Result[] results = table.get(queryRowList);
-            return Arrays.stream(results).map(result -> map(result))::iterator;
+            Result result = table.get(get);
+            return map(result, ids);
         });
     }
 
     public Page<Entity> findAll(Pageable pageable, String filter) throws IOException {
         pageable = getOrDefaultPageable(pageable);
 
-        Page<EntitySearchItem> result = this.entitySearchItemRepository.findAll(pageable, filter);
-        List<String> id = new ArrayList<>();
-        for(EntitySearchItem i : result){
-            id.add(i.getId());
+        Page<EntitySearchItem> result;
+
+        if(Strings.isNullOrEmpty(filter)){
+            result = this.entitySearchItemRepository.findAll(pageable);
         }
-        Iterable<Entity> all = this.findAll(id);
-        return new PageImpl<>(Lists.newArrayList(all.iterator()), pageable, result.getTotalElements());
+        else {
+            result = this.entitySearchItemRepository.findAll(pageable, filter);
+        }
+
+        Map<String, Entity> entitiesMap = new HashMap<>();
+        Map<String, List<String>> entitiesByProject = new HashMap<>();
+        for(EntitySearchItem i : result){
+            entitiesMap.put(i.getProjectId()+'#'+ i.getId(), null);
+            List<String> entities;
+            if(!entitiesByProject.containsKey(i.getProjectId())){
+                entities = new ArrayList<>();
+                entitiesByProject.put(i.getProjectId(), entities);
+            }
+            else {
+                entities = entitiesByProject.get(i.getProjectId());
+            }
+            entities.add(i.getId());
+        }
+
+        for(String p : entitiesByProject.keySet()){
+            Iterable<Entity> projectResult = this.findAll(p, entitiesByProject.get(p));
+            for(Entity e : projectResult){
+                entitiesMap.put(p+'#'+ e.getId(), e);
+            }
+        }
+        List<Entity> entityResult = new ArrayList<>();
+        for(Map.Entry<String, Entity> entry : entitiesMap.entrySet()){
+            entityResult.add(entry.getValue());
+        }
+        return new PageImpl<>(entityResult, pageable, result.getTotalElements());
     }
 
     public Page<Entity> findAllByProject(Pageable pageable, String filter, String projectId) throws IOException {
         pageable = getOrDefaultPageable(pageable);
 
-        Page<EntitySearchItem> result = this.entitySearchItemRepository.findAllByProject(pageable, filter, projectId);
+        Page<EntitySearchItem> result;
+        if(Strings.isNullOrEmpty(filter)){
+            result = this.entitySearchItemRepository.findAllByProject(pageable, projectId);
+        }
+        else {
+            result = this.entitySearchItemRepository.findAllByProject(pageable, filter, projectId);
+        }
+
         List<String> id = new ArrayList<>();
         for(EntitySearchItem i : result){
             id.add(i.getId());
         }
-        Iterable<Entity> all = this.findAll(id);
+        Iterable<Entity> all = this.findAll(projectId, id);
         return new PageImpl<>(Lists.newArrayList(all.iterator()), pageable, result.getTotalElements());
     }
 
-    private Entity map(Result result){
+    private Entity map(Result result, String id){
         try {
-            return result.value() == null ? null : (Entity)objectMapper.readValue(result.value(), Entity.class);
+            byte[] value = result.getValue(Bytes.toBytes(cfEntities), Bytes.toBytes(id));
+            return value == null ? null : (Entity)objectMapper.readValue(value, Entity.class);
         } catch (IOException e) {
-            log.error("Unable to read JSON for "+new String(result.getRow()));
+            log.error("Unable to read JSON for "+new String(result.getRow()), e);
             return null;
         }
+    }
+
+    private Iterable<Entity> map(Result result, Iterable<String> ids){
+        List<Entity> entities = new ArrayList<>();
+        for(String id : ids){
+            entities.add(map(result, id));
+        }
+        return entities;
     }
 
     private EntitySearchItem toEntitySearchItem(Project project, Entity entity) {

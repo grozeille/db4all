@@ -41,19 +41,19 @@
       </div>
     </div>
 
-    <div class="col-md-3" ng-repeat="p in entity.projectList">
+    <div class="col-md-3" ng-repeat="e in entity.entityList">
 
-      <project-card item="p">
-        <a ng-click="entity.deleteEntity(p.id)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
+      <entity-card item="e">
+        <a ng-click="entity.deleteEntity(e.id)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
           <span class="glyphicon glyphicon-remove"></span> Supprimer
         </a>
-        <a ng-click="entity.editEntity(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.editLoading">
-          <span ng-show="!p.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="p.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Editer
+        <a ng-click="entity.editEntity(e.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="e.editLoading">
+          <span ng-show="!p.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="e.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Editer
         </a>
-        <a ng-click="entity.viewEntity(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.viewLoading">
-          <span ng-show="!p.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="p.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Consulter
+        <a ng-click="entity.viewEntity(e.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="e.viewLoading">
+          <span ng-show="!p.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="e.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Consulter
         </a>
-      </project-card>
+      </entity-card>
 
     </div>
 

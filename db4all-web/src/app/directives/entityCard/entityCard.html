@@ -1,0 +1,15 @@
+<div class="panel panel-default" >
+  <div class="panel-header entity-card-header entity-card-header-green">
+  </div>
+  <div class="panel-body entity-card-body" class="entity-card-body">
+    <p class="entity-card-title">
+      <span uib-tooltip="{{item.name}}">{{item.name | limitTo: 20 }}{{ item.name.length > 20 ? '...' : ''}}</span></p>
+    <p style="color:#737373;"><span ng-bind-html="item.comment"></span></p>
+    <br/>
+    <p><span ng-repeat="tag in item.tags"><span class="label label-primary">{{tag}}</span>&nbsp;</span>
+    </p>
+  </div>
+  <div class="panel-footer entity-card-footer">
+    <ng-transclude></ng-transclude>
+  </div>
+</div>

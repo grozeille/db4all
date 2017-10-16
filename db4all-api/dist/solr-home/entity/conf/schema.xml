@@ -118,11 +118,12 @@
          If you don't need it, consider removing it and the corresponding copyField directive.
     -->
     <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+    <field name="projectId" type="string" indexed="true" stored="true" multiValued="false"/>
+
     <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
 
     <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
 
-    <field name="projectId" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="projectName" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="name" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="comment" type="string" indexed="true" stored="false" multiValued="false"/>

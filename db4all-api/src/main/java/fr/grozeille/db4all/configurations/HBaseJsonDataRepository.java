@@ -114,9 +114,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
             return entity;
         } catch (JsonProcessingException e) {
             log.error("Unable to convert to Json object", e);
-        } catch (IllegalAccessException e) {
-            log.error("Unable to get Id", e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("Unable to get Id", e);
         }
 
@@ -167,9 +165,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
         String id = null;
         try {
             id = getId(entity);
-        } catch (IllegalAccessException e) {
-            log.error("Unable to get Id", e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("Unable to get Id", e);
         }
         delete(id);
@@ -213,7 +209,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
                 queryRowList.add(get);
             }
             Result[] results = table.get(queryRowList);
-            return Arrays.stream(results).map(result -> map(result))::iterator;
+            return Arrays.stream(results).map(this::map)::iterator;
         });
     }
 
@@ -292,9 +288,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
 
         } catch (JsonProcessingException e) {
             log.error("Unable to convert to Json object", e);
-        } catch (IllegalAccessException e) {
-            log.error("Unable to get Id", e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("Unable to get Id", e);
         }
 
