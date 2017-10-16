@@ -17,7 +17,8 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   vm.entity = {
     id: '',
     name: '',
-    comment: ''
+    comment: '',
+    tags: []
   };
   vm.tags = [];
 
@@ -25,7 +26,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     if(vm.entityId !== '') {
       entityService.getById(vm.projectId, vm.entityId)
         .then(function(data) {
-          vm.project = data;
+          vm.entity = data;
           vm.tags = [];
           for(var cpt = 0; cpt < vm.entity.tags.length; cpt++) {
             vm.tags.push({text: vm.entity.tags[cpt]});

@@ -16,7 +16,8 @@ function ProjectDetailController($log, $uibModal, $stateParams, projectService) 
   vm.project = {
     id: '',
     name: '',
-    comment: ''
+    comment: '',
+    tags: []
   };
   vm.tags = [];
 

@@ -13,7 +13,7 @@ function navbar($compile) {
           name: 'Projets',
           state: 'project'
         }, {
-          name: 'Entités',
+          name: 'Tables',
           state: 'entity'
         }, {
           name: 'Filtres',

@@ -44,6 +44,7 @@ function EntityController($timeout, $log, $location, $filter, $uibModal, $state,
 
   vm.deleteEntity = function(id) {
     var entity = getEntity(id);
+    var projectId = vm.projectId;
 
     $uibModal.open({
       templateUrl: 'delete.html',
@@ -52,7 +53,7 @@ function EntityController($timeout, $log, $location, $filter, $uibModal, $state,
         var vm = this;
         vm.entityName = entityName;
         vm.ok = function() {
-          entityService.remove(id).then(function() {
+          entityService.remove(projectId, id).then(function() {
             $uibModalInstance.close();
             parent.loadAllEntities();
           });
