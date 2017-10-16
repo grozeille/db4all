@@ -45,16 +45,9 @@ function projectService($log, $http, $location, $filter, $q, $rootScope) {
     return $http.delete(url).catch(vm.catchServiceException);
   }
 
-  function add(project) {
-    var url = vm.apiHost + '/project';
-
-    return $http.post(url, project).catch(vm.catchServiceException);
-  }
-
   var service = {
     getAllProjects: getAllProjects,
     getById: getById,
-    add: add,
     remove: remove,
     save: save
   };

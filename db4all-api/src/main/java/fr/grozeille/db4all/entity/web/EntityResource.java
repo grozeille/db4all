@@ -22,7 +22,7 @@ import java.net.URI;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/entity")
+@RequestMapping("/api/project")
 public class EntityResource {
 
     @Autowired
@@ -41,25 +41,7 @@ public class EntityResource {
                             "Default sort order is ascending. " +
                             "Multiple sort criteria are supported.")
     })
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Page<Entity> filter(
-            Pageable pageable,
-            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
-
-        return entityRepository.findAll(pageable, filter);
-    }
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-                    value = "Results page you want to retrieve (0..N)"),
-            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-                    value = "Number of records per page."),
-            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
-                    value = "Sorting criteria in the format: property(,asc|desc). " +
-                            "Default sort order is ascending. " +
-                            "Multiple sort criteria are supported.")
-    })
-    @RequestMapping(value = "/{project}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{project}/entity", method = RequestMethod.GET)
     public Page<Entity> filter(
             Pageable pageable,
             @PathVariable("project") String project,
@@ -68,15 +50,15 @@ public class EntityResource {
         return entityRepository.findAllByProject(pageable, filter, project);
     }
 
-    @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{project}/entity/{entity}", method = RequestMethod.GET)
     public ResponseEntity<Entity> get(@PathVariable("project") String project,
                                       @PathVariable("entity") String entity) throws IOException {
         Entity result = entityRepository.findOne(project, entity);
         return ResponseEntity.ok(result);
     }
 
-    @RequestMapping(value = "/{project}", method = RequestMethod.POST)
-    public ResponseEntity<?> create(
+    @RequestMapping(value = "/{project}/entity", method = RequestMethod.POST)
+    public ResponseEntity<Entity> create(
             @PathVariable("project") String project,
             @RequestBody EntityCreationRequest request) throws Exception {
 
@@ -92,32 +74,32 @@ public class EntityResource {
                 request.getTags()));
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/entity/{project}/{entity}")
+                .fromCurrentContextPath().path("/api/project/{project}/entity/{entity}")
                 .buildAndExpand(project, createdEntity.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(createdEntity);
     }
 
-    @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> update(
+    @RequestMapping(value = "/{project}/entity/{entity}", method = RequestMethod.PUT)
+    public ResponseEntity<Entity> update(
             @PathVariable("project") String project,
             @PathVariable("entity") String entity,
             @RequestBody Entity entityItem) throws Exception {
 
         if(!entity.equals(entityItem.getId())){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null);
         }
 
         if (checkEntityExists(project, entity)) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        entityRepository.save(project, entityItem);
+        entityItem = entityRepository.save(project, entityItem);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(entityItem);
     }
 
-    @RequestMapping(value = "/{project}/{entity}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{project}/entity/{entity}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(
             @PathVariable("project") String project,
             @PathVariable("entity") String entity) throws Exception {

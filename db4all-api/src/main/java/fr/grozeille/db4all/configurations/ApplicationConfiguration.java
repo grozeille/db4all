@@ -52,15 +52,20 @@ public class ApplicationConfiguration {
         return client;
     }
 
+    @Bean(name = "solrProjectTemplate")
+    public SolrOperations solrProjectTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrProjectClient());
+    }
+
+    @Bean
+    public ProjectSearchItemRepository projectSearchItemRepository() throws IOException, SAXException, ParserConfigurationException {
+        return new SolrRepositoryFactory(this.solrProjectTemplate()).getRepository(ProjectSearchItemRepository.class);
+    }
+
     @Bean SolrClient solrEntityClient() throws ParserConfigurationException, SAXException, IOException {
         CloudSolrClient client = new CloudSolrClient(clusterConfiguration().getSolr().getZkUrl());
         client.setDefaultCollection("entity");
         return client;
-    }
-
-    @Bean(name = "solrProjectTemplate")
-    public SolrOperations solrProjectTemplate() throws ParserConfigurationException, SAXException, IOException {
-        return new SolrTemplate(solrProjectClient());
     }
 
     @Bean(name = "solrEntityTemplate")
@@ -71,11 +76,6 @@ public class ApplicationConfiguration {
     @Bean
     public EntitySearchItemRepository entitySearchItemRepository() throws IOException, SAXException, ParserConfigurationException {
         return new SolrRepositoryFactory(this.solrEntityTemplate()).getRepository(EntitySearchItemRepository.class);
-    }
-
-    @Bean
-    public ProjectSearchItemRepository projectSearchItemRepository() throws IOException, SAXException, ParserConfigurationException {
-        return new SolrRepositoryFactory(this.solrProjectTemplate()).getRepository(ProjectSearchItemRepository.class);
     }
 
     @Bean

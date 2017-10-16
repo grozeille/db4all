@@ -10,4 +10,5 @@ angular.module('datalakeToolbox')
   .service('viewDataSetService', require('./viewDataSet/viewDataSet.service'))
   .service('adminService', require('./admin/admin.service'))
   .service('projectService', require('./project/project.service'))
+  .service('entityService', require('./entity/entity.service'))
   .service('userService', require('./user/user.service'));

@@ -3,6 +3,7 @@ package fr.grozeille.db4all.project.repositories;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import fr.grozeille.db4all.configurations.HBaseWithSolrJsonDataRepository;
+import fr.grozeille.db4all.entity.repositories.EntitySearchItemRepository;
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.model.ProjectSearchItem;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,13 @@ public class ProjectRepository extends HBaseWithSolrJsonDataRepository<Project, 
 
     private final ProjectSearchItemRepository projectSearchItemRepository;
 
+    private final EntitySearchItemRepository entitySearchItemRepository;
+
     @Autowired
-    public ProjectRepository(ProjectSearchItemRepository projectSearchItemRepository) throws IntrospectionException, InvalidClassException {
-        super(Project.class, "projects", projectSearchItemRepository, ProjectSearchItem.class);
+    public ProjectRepository(ProjectSearchItemRepository projectSearchItemRepository, EntitySearchItemRepository entitySearchItemRepository) throws IntrospectionException, InvalidClassException {
+        super(Project.class, "projects", new String[]{ "cfEntities" }, projectSearchItemRepository, ProjectSearchItem.class);
         this.projectSearchItemRepository = projectSearchItemRepository;
+        this.entitySearchItemRepository = entitySearchItemRepository;
     }
 
     @Override
@@ -51,6 +55,12 @@ public class ProjectRepository extends HBaseWithSolrJsonDataRepository<Project, 
             Iterable<Project> all = this.findAll(id);
             return new PageImpl<>(Lists.newArrayList(all.iterator()), pageable, result.getTotalElements());
         }
+    }
+
+    @Override
+    public void deleteAll() {
+        super.deleteAll();
+        entitySearchItemRepository.deleteAll();
     }
 
     @Override

@@ -11,6 +11,6 @@ import java.io.InvalidClassException;
 public class UserRepository extends HBaseJsonDataRepository<User> {
 
     public UserRepository() throws IntrospectionException, InvalidClassException {
-        super(User.class, "users");
+        super(User.class, "users", new String[0]);
     }
 }

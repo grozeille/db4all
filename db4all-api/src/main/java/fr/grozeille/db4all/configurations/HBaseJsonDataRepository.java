@@ -60,7 +60,7 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
 
     private PropertyDescriptor idProp;
 
-    public HBaseJsonDataRepository(Class entityClass, String tableName, String... additionalColumnFamilies) throws IntrospectionException, InvalidClassException {
+    public HBaseJsonDataRepository(Class entityClass, String tableName, String[] additionalColumnFamilies) throws IntrospectionException, InvalidClassException {
 
         this.tableName = tableName;
         this.entityClass = entityClass;
@@ -208,7 +208,9 @@ public class HBaseJsonDataRepository<T> implements CrudRepository<T, String>, In
         return hbaseTemplate.execute(tableName, table -> {
             List<Get> queryRowList = new ArrayList<>();
             for(String id : ids) {
-                queryRowList.add(new Get(Bytes.toBytes(id)));
+                Get get = new Get(Bytes.toBytes(id));
+                get.addFamily(Bytes.toBytes(cfInfo));
+                queryRowList.add(get);
             }
             Result[] results = table.get(queryRowList);
             return Arrays.stream(results).map(result -> map(result))::iterator;

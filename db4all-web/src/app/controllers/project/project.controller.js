@@ -70,6 +70,10 @@ function ProjectController($timeout, $log, $location, $filter, $uibModal, $state
     });
   };
 
+  vm.viewProject = function(id) {
+    $state.go('entity', {projectId: id});
+  };
+
   vm.loadAllProjects = function() {
     projectService.getAllProjects(vm.sourceFilter, vm.currentPage - 1, vm.itemsPerPage).then(function(data) {
       vm.projectList = data.content;

@@ -4,10 +4,10 @@
 
 <script type="text/ng-template" id="delete.html">
   <div class="modal-header">
-    <h3 class="modal-title">Supprimer le projet ?</h3>
+    <h3 class="modal-title">Supprimer la table ?</h3>
   </div>
   <div class="modal-body">
-    <p>Êtes-vous sûr de vouloir supprimer le projet {{delete.projectName}} ?</p>
+    <p>Êtes-vous sûr de vouloir supprimer la table {{delete.entityName}} ?</p>
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary" type="button" ng-click="delete.ok()">OK</button>
@@ -18,12 +18,12 @@
 <div class="container-fluid page-container" style="padding-top:20px;">
 
   <div class="row" style="margin-bottom:20px;">
-    <form ng-submit="project.loadAllProjects()">
+    <form ng-submit="entity.loadAllEntities()">
       <div class="col-md-12">
 
         <div class="input-group" >
           <span class="input-group-addon" id="catalog-filter"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-          <input ng-model="project.sourceFilter" type="text" class="form-control" placeholder="Filtre" aria-describedby="view-filter">
+          <input ng-model="entity.sourceFilter" type="text" class="form-control" placeholder="Filtre" aria-describedby="view-filter">
         </div>
       </div>
     </form>
@@ -35,22 +35,22 @@
 
       <div class="panel panel-default" >
         <div class="panel-body" style="height:378px; overflow: hidden;">
-          <a ng-click="project.createNewProject()" ><img style="display:block;margin-left:auto;margin-right:auto;margin-top:80px;cursor: pointer;" src="../../assets/images/plus-outline-gray.png"/></a>
+          <a ng-click="entity.createNewEntity()" ><img style="display:block;margin-left:auto;margin-right:auto;margin-top:80px;cursor: pointer;" src="../../assets/images/plus-outline-gray.png"/></a>
         </div>
 
       </div>
     </div>
 
-    <div class="col-md-3" ng-repeat="p in project.projectList">
+    <div class="col-md-3" ng-repeat="p in entity.projectList">
 
       <project-card item="p">
-        <a ng-click="project.deleteProject(p.id)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
+        <a ng-click="entity.deleteEntity(p.id)" class="btn btn-danger btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align">
           <span class="glyphicon glyphicon-remove"></span> Supprimer
         </a>
-        <a ng-click="project.editProject(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.editLoading">
+        <a ng-click="entity.editEntity(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.editLoading">
           <span ng-show="!p.editLoading" class="glyphicon glyphicon-pencil"></span><span ng-show="p.editLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Editer
         </a>
-        <a ng-click="project.viewProject(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.viewLoading">
+        <a ng-click="entity.viewEntity(p.id)" class="btn btn-default btn-sm pull-right" style="margin-left:5px;" aria-label="Left Align" ng-disabled="p.viewLoading">
           <span ng-show="!p.viewLoading" class="glyphicon glyphicon-eye-open"></span><span ng-show="p.viewLoading" class="fa fa-spinner fa-spin" style="color: inherit;font-size: 15px;"></span> Consulter
         </a>
       </project-card>
@@ -64,10 +64,10 @@
     <div class="col-md-12">
       <div class="text-center">
         <ul uib-pagination
-            items-per-page="project.itemsPerPage"
-            total-items="project.pageResult.totalElements"
-            ng-model="project.currentPage"
-            ng-change="project.loadAllProjects()"
+            items-per-page="entity.itemsPerPage"
+            total-items="entity.pageResult.totalElements"
+            ng-model="entity.currentPage"
+            ng-change="entity.loadAllEntities()"
             first-text="Début"
             previous-text="Précédent"
             last-text="Find"

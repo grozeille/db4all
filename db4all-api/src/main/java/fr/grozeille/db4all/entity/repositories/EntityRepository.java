@@ -127,6 +127,7 @@ public class EntityRepository {
         searchItem.setComment(entity.getComment());
         searchItem.setTags(entity.getTags());
         searchItem.setProjectName(project.getName());
+        searchItem.setProjectId(project.getId());
         return searchItem;
     }
 

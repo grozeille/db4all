@@ -122,6 +122,7 @@
 
     <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
 
+    <field name="projectId" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="projectName" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="name" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="comment" type="string" indexed="true" stored="false" multiValued="false"/>

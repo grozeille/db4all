@@ -19,6 +19,9 @@ public class EntitySearchItem {
     private String text;
 
     @Field
+    private String projectId;
+
+    @Field
     private String projectName;
 
     @Field

@@ -31,8 +31,8 @@ public abstract class HBaseWithSolrJsonDataRepository<T, I> extends HBaseJsonDat
 
     protected final Class searchItemClass;
 
-    public HBaseWithSolrJsonDataRepository(Class entityClass, String tableName, SolrCrudRepository<I, String> solrRepository, Class searchItemClass) throws IntrospectionException, InvalidClassException {
-        super(entityClass, tableName);
+    public HBaseWithSolrJsonDataRepository(Class entityClass, String tableName, String[] additionalColumnFamilies, SolrCrudRepository<I, String> solrRepository, Class searchItemClass) throws IntrospectionException, InvalidClassException {
+        super(entityClass, tableName, additionalColumnFamilies);
         this.solrRepository = solrRepository;
         this.searchItemClass = searchItemClass;
 

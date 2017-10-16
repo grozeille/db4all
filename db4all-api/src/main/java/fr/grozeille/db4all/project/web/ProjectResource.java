@@ -1,5 +1,6 @@
 package fr.grozeille.db4all.project.web;
 
+import fr.grozeille.db4all.entity.repositories.EntitySearchItemRepository;
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import fr.grozeille.db4all.project.web.dto.ProjectCreationRequest;
@@ -84,7 +85,7 @@ public class ProjectResource {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        projectRepository.save(project);
+        project = projectRepository.save(project);
 
         return ResponseEntity.ok().body(project);
     }
@@ -94,4 +95,9 @@ public class ProjectResource {
         this.projectRepository.delete(id);
     }
 
+    @RequestMapping(value = "/all", method = RequestMethod.DELETE)
+    public void clearAll()
+    {
+        this.projectRepository.deleteAll();
+    }
 }
