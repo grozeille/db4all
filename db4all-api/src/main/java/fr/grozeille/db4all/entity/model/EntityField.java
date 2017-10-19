@@ -7,15 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Entity {
-
-    private String id;
-
+public class EntityField {
     private String name;
 
-    private String comment;
-
-    private String[] tags;
-
-    private EntityField[] fields;
+    private EntityFieldType type;
 }

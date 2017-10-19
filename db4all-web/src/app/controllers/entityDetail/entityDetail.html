@@ -34,58 +34,146 @@
       <div class="row fill-height-substract">
 
         <div class="col-sm-12">
-          <div class="panel panel-default" style="height: auto;">
-            <div class="panel-body">
+          <uib-tabset>
+            <uib-tab index="0" heading="Table">
 
-              <fieldset>
-                <form style="padding: 0px;">
+              <div class="panel panel-default panel-editor-tab" style="height: auto;">
+                <div class="panel-body">
 
-                  <div class="row">
-
-                    <div class="col-md-8">
+                  <fieldset>
+                    <form style="padding: 0px;">
 
                       <div class="row">
 
+                        <div class="col-md-8">
+
+                          <div class="row">
+
+                            <div class="col-sm-12">
+                              <div class="form-group">
+                                <label for="inputEntityName" class="control-label">Nom de la table</label>
+                                <input class="form-control" id="inputEntityName" placeholder="" ng-model="entityDetail.entity.name">
+                              </div>
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="col-sm-12">
+                              <div class="form-group">
+                                <label for="inputTableDescription" class="control-label">Description</label>
+                                <input class="form-control" id="inputTableDescription" placeholder="" ng-model="entityDetail.entity.comment">
+                              </div>
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="form-group">
+                                <label class="control-label">Tags</label>
+                                <tags-input ng-model="entityDetail.tags" placeholder="Ajouter un Tag"></tags-input>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </form>
+                  </fieldset>
+
+                </div>
+              </div>
+
+            </uib-tab>
+            <uib-tab index="1" heading="Champs">
+              <div class="panel panel-default panel-editor-tab" style="height: auto;">
+                <div class="panel-body">
+                  <fieldset>
+                    <form style="padding: 0px;">
+                      <div class="row">
                         <div class="col-sm-12">
+                          <a id="addNewField" type="button" class="btn btn-primary" ng-click="entityDetail.addNewField()">
+                            <span class="glyphicon glyphicon-plus"></span> Add
+                          </a>
+
+                        </div>
+                      </div>
+
+                      <div class="row" style="padding-top:20px;">
+
+                        <div class="col-sm-4">
                           <div class="form-group">
-                            <label for="inputEntityName" class="control-label">Nom de la table</label>
-                            <input class="form-control" id="inputEntityName" placeholder="" ng-model="entityDetail.entity.name">
+                            <label for="inputFieldName" class="control-label">Nom du champ</label>
+                            <input class="form-control" id="inputFieldName" placeholder="" ng-model="entityDetail.currentField.name" ng-disabled="!entityDetail.edition">
+                          </div>
+                        </div>
+                        <div class="col-sm-4">
+                          <div class="form-group">
+                            <label for="inputFieldName" class="control-label">Type du champ</label>
+                            <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="entityDetail.currentField.type" ng-disabled="!entityDetail.edition">
+                              <option value="TEXT">Text</option>
+                              <option value="NUMERIC">Numérique</option>
+                              <option value="DATE">Date</option>
+                              <option value="LINK">Lien Table</option>
+                              <option value="LINK_MULTIPLE">Lien Table Multiple</option>
+                            </select>
                           </div>
                         </div>
 
                       </div>
-
-                      <div class="row">
-
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label for="inputTableDescription" class="control-label">Description</label>
-                            <input class="form-control" id="inputTableDescription" placeholder="" ng-model="entityDetail.entity.comment">
-                          </div>
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
                       <div class="row">
                         <div class="col-sm-12">
-                          <div class="form-group">
-                            <label class="control-label">Tags</label>
-                            <tags-input ng-model="entityDetail.tags" placeholder="Ajouter un Tag"></tags-input>
-                          </div>
+                          <a id="saveField" type="button" class="btn btn-primary" ng-click="entityDetail.saveField()" ng-disabled="!entityDetail.edition">
+                            Save
+                          </a>
+                          <a id="cancelField" type="button" class="btn btn-default" ng-click="entityDetail.cancelField()" ng-disabled="!entityDetail.edition">
+                            Cancel
+                          </a>
+
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                </form>
-              </fieldset>
 
-            </div>
-          </div>
+                      <div class="row" style="padding-top:20px;">
+                        <div class="col-sm-12">
+                          <table class="table table-sm">
+                            <thead>
+                              <tr>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr ng-repeat="field in entityDetail.entity.fields track by $index">
+                                <td>
+                                  {{field.name}}
+                                </td>
+                                <td>
+                                  {{field.typeString}}
+                                </td>
+                                <td>
+                                  <button class="btn btn-primary" ng-click="entityDetail.editField($index)" >Editer</button>
+                                  <button class="btn btn-danger" ng-click="entityDetail.removeField($index)" >Supprimer</button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                    </form>
+                  </fieldset>
+                </div>
+              </div>
+            </uib-tab>
+          </uib-tabset>
         </div>
 
 

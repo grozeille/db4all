@@ -2,6 +2,7 @@ package fr.grozeille.db4all.entity.web;
 
 import com.google.common.base.Strings;
 import fr.grozeille.db4all.entity.model.Entity;
+import fr.grozeille.db4all.entity.model.EntityField;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
 import fr.grozeille.db4all.entity.web.dto.EntityCreationRequest;
 import fr.grozeille.db4all.project.model.Project;
@@ -71,7 +72,8 @@ public class EntityResource {
                 null,
                 request.getName(),
                 request.getComment(),
-                request.getTags()));
+                request.getTags(),
+                new EntityField[0]));
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/project/{project}/entity/{entity}")
