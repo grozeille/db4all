@@ -12,7 +12,7 @@
 
       <div class="form-group">
         <a type="button" class="btn btn-primary" aria-label="Left Align" ui-sref="entity({projectId: entityDetail.projectId})" style="margin-right:10px;">
-          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Précédent
         </a>
       </div>
     </div>
@@ -20,7 +20,7 @@
 
       <div class="form-group" style="height:34px;"> <!-- fix height because pull-right doesn't allow to auto-calculate -->
         <a type="button" class="btn btn-primary pull-right" ng-click="entityDetail.save()" ng-disabled="entityDetail.saving">
-          <span ng-show="entityDetail.saving" class="fa fa-spinner fa-spin" style="color: inherit;"></span><span ng-show="!entityDetail.saving" class="glyphicon glyphicon-save"></span> Save
+          <span ng-show="entityDetail.saving" class="fa fa-spinner fa-spin" style="color: inherit;"></span><span ng-show="!entityDetail.saving" class="glyphicon glyphicon-save"></span> Sauvegarder
         </a>
       </div>
 
@@ -96,16 +96,8 @@
                 <div class="panel-body">
                   <fieldset>
                     <form style="padding: 0px;">
+
                       <div class="row">
-                        <div class="col-sm-12">
-                          <a id="addNewField" type="button" class="btn btn-primary" ng-click="entityDetail.addNewField()">
-                            <span class="glyphicon glyphicon-plus"></span> Add
-                          </a>
-
-                        </div>
-                      </div>
-
-                      <div class="row" style="padding-top:20px;">
 
                         <div class="col-sm-4">
                           <div class="form-group">
@@ -130,15 +122,20 @@
                       <div class="row">
                         <div class="col-sm-12">
                           <a id="saveField" type="button" class="btn btn-primary" ng-click="entityDetail.saveField()" ng-disabled="!entityDetail.edition">
-                            Save
+                            Sauvegarder
                           </a>
                           <a id="cancelField" type="button" class="btn btn-default" ng-click="entityDetail.cancelField()" ng-disabled="!entityDetail.edition">
-                            Cancel
+                            Annuler
                           </a>
 
                         </div>
                       </div>
 
+                      <div class="row">
+                        <div class="col-sm-12">
+
+                        </div>
+                      </div>
 
                       <div class="row" style="padding-top:20px;">
                         <div class="col-sm-12">
@@ -151,6 +148,15 @@
                               </tr>
                             </thead>
                             <tbody>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                  <a id="addNewField" type="button" class="btn btn-success" ng-click="entityDetail.addNewField()" ng-disabled="entityDetail.edition">
+                                    <span class="glyphicon glyphicon-plus"></span> Nouveau
+                                  </a>
+                                </td>
+                              </tr>
                               <tr ng-repeat="field in entityDetail.entity.fields track by $index">
                                 <td>
                                   {{field.name}}

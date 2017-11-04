@@ -45,11 +45,25 @@ function entityService($log, $http, $location, $filter, $q, $rootScope) {
     return $http.delete(url).catch(vm.catchServiceException);
   }
 
+  function getData(projectId, entityId) {
+    var url = vm.apiHost + '/project/' + projectId + '/entity/' + entityId + '/data';
+
+    return $http.get(url).then(vm.getServiceData).catch(vm.catchServiceException);
+  }
+
+  function saveData(projectId, entityId, data) {
+    var url = vm.apiHost + '/project/' + projectId + '/entity/' + entityId + '/data';
+
+    return $http.put(url, data).catch(vm.catchServiceException);
+  }
+
   var service = {
     getAllEntities: getAllEntities,
     getById: getById,
     remove: remove,
-    save: save
+    save: save,
+    getData: getData,
+    saveData: saveData
   };
 
   return service;

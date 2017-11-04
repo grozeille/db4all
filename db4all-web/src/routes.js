@@ -51,6 +51,10 @@ function routesConfig($stateProvider, $urlRouterProvider) {
       url: '/project/:projectId/entity/:id',
       component: 'entityDetailControllerComponent'
     })
+    .state('entityData', {
+      url: '/project/:projectId/entity/:id/data',
+      component: 'entityDataControllerComponent'
+    })
     ;
 
   $urlRouterProvider.otherwise('/project');

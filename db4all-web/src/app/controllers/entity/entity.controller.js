@@ -42,6 +42,10 @@ function EntityController($timeout, $log, $location, $filter, $uibModal, $state,
     $state.go('entityDetail', {projectId: vm.projectId, id: id});
   };
 
+  vm.viewEntity = function(id) {
+    $state.go('entityData', {projectId: vm.projectId, id: id});
+  };
+
   vm.deleteEntity = function(id) {
     var entity = getEntity(id);
     var projectId = vm.projectId;

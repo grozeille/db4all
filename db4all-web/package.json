@@ -7,7 +7,9 @@
     "url": "git+https://github.com/grozeille/db4all.git"
   },
   "dependencies": {
+    "ace-builds": "^1.2.8",
     "angular": "^1.6.2",
+    "angular-ui-ace": "^0.2.3",
     "angular-ui-bootstrap": "2.0.0",
     "angular-ui-grid": "3.2.9",
     "angular-ui-router": "1.0.0-beta.3",
@@ -16,12 +18,12 @@
     "bootstrap-filestyle": "^1.2.1",
     "font-awesome": "^4.6.3",
     "font-awesome-loader": "^1.0.1",
+    "handsontable": "^0.34.5",
     "jquery": "^3.1.1",
     "ng-file-upload": "^12.2.13",
+    "ng-handsontable": "^0.13.0",
     "ng-tags-input": "^3.1.1",
-    "ui-select": "^0.19.6",
-    "ace-builds": "^1.2.8",
-    "angular-ui-ace": "^0.2.3"
+    "ui-select": "^0.19.6"
   },
   "devDependencies": {
     "@types/angular": "^1.6.6",

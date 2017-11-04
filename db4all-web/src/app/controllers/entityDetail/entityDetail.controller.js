@@ -55,7 +55,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
           for(var cpt = 0; cpt < vm.entity.tags.length; cpt++) {
             vm.tags.push({text: vm.entity.tags[cpt]});
           }
-          if(angular.isUndefined(vm.entity.fields)) {
+          if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
             vm.entity.fields = [];
           }
           for(var cptField = 0; cptField < vm.entity.fields; cptField++) {
@@ -125,7 +125,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
 
   vm.editField = function(index) {
     vm.currentFieldIndex = index;
-    vm.currentField = vm.entity.fields[index];
+    vm.currentField = angular.copy(vm.entity.fields[index]);
     vm.edition = true;
   };
 

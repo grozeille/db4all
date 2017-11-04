@@ -66,6 +66,9 @@ module.exports = {
         $: "jquery",
         jQuery: "jquery"
     }),
+    new webpack.ProvidePlugin({
+        Handsontable: "handsontable/dist/handsontable.full.js"
+    }),
     new webpack.LoaderOptionsPlugin({
       options: {
         postcss: () => [Autoprefixer]

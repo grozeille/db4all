@@ -30,7 +30,7 @@ function fillHeight($window, $log) {
       });
     }
 
-    elem.css('height', winHeight - headerHeight - 60 + 'px');
+    elem.css('height', winHeight - headerHeight - 20 + 'px');
     elem.css('min-height', '200px');
   };
 

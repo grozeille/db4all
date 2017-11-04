@@ -15,5 +15,6 @@ angular.module('datalakeToolbox')
   .component('projectControllerComponent', require('./project/project.controller'))
   .component('projectDetailControllerComponent', require('./projectDetail/projectDetail.controller'))
   .component('entityControllerComponent', require('./entity/entity.controller'))
-  .component('entityDetailControllerComponent', require('./entityDetail/entityDetail.controller'));
+  .component('entityDetailControllerComponent', require('./entityDetail/entityDetail.controller'))
+  .component('entityDataControllerComponent', require('./entityData/entityData.controller'));
 

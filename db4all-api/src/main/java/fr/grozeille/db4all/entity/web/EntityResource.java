@@ -2,7 +2,9 @@ package fr.grozeille.db4all.entity.web;
 
 import com.google.common.base.Strings;
 import fr.grozeille.db4all.entity.model.Entity;
+import fr.grozeille.db4all.entity.model.EntityData;
 import fr.grozeille.db4all.entity.model.EntityField;
+import fr.grozeille.db4all.entity.repositories.EntityDataRepository;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
 import fr.grozeille.db4all.entity.web.dto.EntityCreationRequest;
 import fr.grozeille.db4all.project.model.Project;
@@ -20,6 +22,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -31,6 +36,9 @@ public class EntityResource {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private EntityDataRepository entityDataRepository;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -111,8 +119,36 @@ public class EntityResource {
         }
 
         entityRepository.delete(project, entity);
+        entityDataRepository.delete(project, entity);
 
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/{project}/entity/{entity}/data", method = RequestMethod.PUT)
+    public ResponseEntity<Void> updateData(
+            @PathVariable("project") String project,
+            @PathVariable("entity") String entity,
+            @RequestBody Map<String, Object>[] entityData) throws Exception {
+
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        entityDataRepository.save(project, entity, new EntityData(Arrays.asList(entityData)));
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    @RequestMapping(value = "/{project}/entity/{entity}/data", method = RequestMethod.GET)
+    public ResponseEntity<List<Map<String, Object>>> getData(@PathVariable("project") String project,
+                                                             @PathVariable("entity") String entity) throws Exception {
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        EntityData entityData = entityDataRepository.findOne(project, entity);
+
+        return ResponseEntity.ok(entityData.getData());
     }
 
     private boolean checkEntityExists(String project, String entity) {

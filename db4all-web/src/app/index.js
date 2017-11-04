@@ -17,6 +17,9 @@ require('angular-sanitize');
 require('font-awesome-loader');
 require('ace-builds/src-min-noconflict/ace');
 require('angular-ui-ace');
+require('handsontable/dist/handsontable.full');
+require('handsontable/dist/handsontable.full.css');
+require('ng-handsontable/dist/ngHandsontable');
 
 angular
   .module('datalakeToolbox', [
@@ -29,7 +32,8 @@ angular
     'ui.ace',
     'ngSanitize',
     'ngTagsInput',
-    'ngFileUpload']);
+    'ngFileUpload',
+    'ngHandsontable']);
 
 require('./directives');
 require('./services');
