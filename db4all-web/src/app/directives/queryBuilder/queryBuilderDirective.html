@@ -1,9 +1,9 @@
 <div class="query-group">
     <div class="form-inline query-header-form">
         <select ng-options="o.name as o.name for o in operators" ng-model="group.operator" class="form-control input-sm" style="padding-right: 30px; padding-top:0px;"></select>
-        <button style="margin-left: 5px" ng-click="addCondition()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Condition</button>
-        <button style="margin-left: 5px" ng-click="addGroup()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Group</button>
-        <button style="margin-left: 5px" ng-click="removeGroup()" ng-show="removeVisible" class="btn btn-sm btn-danger btn-sm"><span class="glyphicon glyphicon-minus-sign"></span> Remove Group</button>
+        <button style="margin-left: 5px" ng-click="addCondition()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Ajouter une condition</button>
+        <button style="margin-left: 5px" ng-click="addGroup()" class="btn btn-sm btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Ajouter un groupe</button>
+        <button style="margin-left: 5px" ng-click="removeGroup()" ng-show="removeVisible" class="btn btn-sm btn-danger btn-sm"><span class="glyphicon glyphicon-minus-sign"></span> Supprimer le groupe</button>
     </div>
     <div class="query-group-conditions">
         <div ng-repeat="rule in group.rules | orderBy:'index'" class="query-condition">

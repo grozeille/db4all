@@ -9,8 +9,8 @@ function queryBuilder($window, $log, $compile) {
 
     return function(scope, element, attrs) {
       scope.operators = [
-        {name: 'AND'},
-        {name: 'OR'}
+        {name: 'ET'},
+        {name: 'OU'}
       ];
 
       scope.conditions = [
@@ -20,16 +20,16 @@ function queryBuilder($window, $log, $compile) {
         {name: '<='},
         {name: '>'},
         {name: '>='},
-        {name: 'IS NULL', noArgs: true},
-        {name: 'IS NOT NULL', noArgs: true},
-        {name: 'BEGINS WITH'},
-        {name: 'NOT BEGINS WITH'},
-        {name: 'CONTAINS'},
-        {name: 'NOT CONTAINS'},
-        {name: 'ENDS WITH'},
-        {name: 'NOT ENDS WITH'},
-        {name: 'IN', help: 'use comma separated values'},
-        {name: 'NOT IN', help: 'use comma separated values'}
+        {name: 'EST NULL', noArgs: true},
+        {name: 'N\'EST PAS NULL', noArgs: true},
+        {name: 'COMMENCE PAR'},
+        {name: 'NE COMMENCE PAS PAR'},
+        {name: 'CONTIENT'},
+        {name: 'NE CONTIENT PAS'},
+        {name: 'TERMINE PAR'},
+        {name: 'NE TERMINE PAS PAR'},
+        {name: 'DANS', help: 'utilisez une virgule comme séparateur'},
+        {name: 'N\'EST PAS DANS', help: 'utilisez une virgule comme séparateur'}
       ];
 
       scope.addCondition = function() {
@@ -56,7 +56,7 @@ function queryBuilder($window, $log, $compile) {
 
         scope.group.rules.push({
           group: {
-            operator: 'AND',
+            operator: 'ET',
             rules: []
           }
         });
