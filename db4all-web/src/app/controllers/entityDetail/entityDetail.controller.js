@@ -25,8 +25,10 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
 
   vm.currentField = null;
   vm.currentFieldIndex = -1;
-
-  vm.edition = false;
+  vm.newField = {
+    name: '',
+    type: 'TEXT'
+  };
 
   function toTextType(type) {
     if(type === 'TEXT') {
@@ -52,13 +54,13 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
         .then(function(data) {
           vm.entity = data;
           vm.tags = [];
-          for(var cpt = 0; cpt < vm.entity.tags.length; cpt++) {
-            vm.tags.push({text: vm.entity.tags[cpt]});
+          for(var cptTags in vm.entity.tags) {
+            vm.tags.push({text: vm.entity.tags[cptTags]});
           }
           if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
             vm.entity.fields = [];
           }
-          for(var cptField = 0; cptField < vm.entity.fields; cptField++) {
+          for(var cptField in vm.entity.fields) {
             vm.entity.fields[cptField].typeString = toTextType(vm.entity.fields[cptField].type);
           }
         })
@@ -92,44 +94,36 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
       });
   };
 
-  function resetField() {
+  function resetNewField() {
     vm.currentFieldIndex = -1;
-    vm.currentField = {
+    vm.newField = {
       name: '',
       type: 'TEXT'
     };
   }
 
   vm.addNewField = function() {
-    resetField();
-    vm.edition = true;
+    vm.entity.fields.unshift(vm.newField);
+    resetNewField();
   };
 
   vm.saveField = function() {
     vm.currentField.typeString = toTextType(vm.currentField.type);
-    if(vm.currentFieldIndex === -1) {
-      vm.entity.fields.unshift(vm.currentField);
-    }
-    else {
-      vm.entity.fields[vm.currentFieldIndex] = vm.currentField;
-    }
-
-    resetField();
-    vm.edition = false;
+    vm.entity.fields[vm.currentFieldIndex] = vm.currentField;
+    vm.currentFieldIndex = -1;
   };
 
   vm.cancelField = function() {
-    resetField();
-    vm.edition = false;
+    vm.currentFieldIndex = -1;
   };
 
   vm.editField = function(index) {
-    vm.currentFieldIndex = index;
     vm.currentField = angular.copy(vm.entity.fields[index]);
-    vm.edition = true;
+    vm.currentFieldIndex = index;
   };
 
   vm.removeField = function(index) {
+    vm.entity.fields.splice(index, 1);
   };
 
   function activate() {

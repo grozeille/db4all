@@ -10,4 +10,5 @@ angular.module('datalakeToolbox')
   .directive('alertsPopup', require('./alertsPopup/alertsPopup.directive'))
   .directive('datasetCard', require('./datasetCard/datasetCard.directive'))
   .directive('projectCard', require('./projectCard/projectCard.directive'))
-  .directive('entityCard', require('./entityCard/entityCard.directive'));
+  .directive('entityCard', require('./entityCard/entityCard.directive'))
+  .directive('fieldEditor', require('./fieldEditor/fieldEditor.directive'));

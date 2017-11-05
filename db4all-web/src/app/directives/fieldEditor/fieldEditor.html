@@ -1,0 +1,27 @@
+<div class="row">
+
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label for="inputFieldName" class="control-label">Nom du champ</label>
+      <input class="form-control" id="inputFieldName" placeholder="" ng-model="field.name">
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label for="inputFieldName" class="control-label">Type du champ</label>
+      <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="field.type">
+        <option value="TEXT">Text</option>
+        <option value="NUMERIC">Numérique</option>
+        <option value="DATE">Date</option>
+        <option value="LINK">Lien Table</option>
+        <option value="LINK_MULTIPLE">Lien Table Multiple</option>
+      </select>
+    </div>
+  </div>
+
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <ng-transclude></ng-transclude>
+  </div>
+</div>

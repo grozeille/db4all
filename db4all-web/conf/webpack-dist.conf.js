@@ -66,6 +66,9 @@ module.exports = {
         $: "jquery",
         jQuery: "jquery"
     }),
+    new webpack.ProvidePlugin({
+        Handsontable: "handsontable/dist/handsontable.full.js"
+    }),
     new webpack.optimize.UglifyJsPlugin({
       output: {comments: false},
       compress: {unused: true, dead_code: true, warnings: false}, // eslint-disable-line camelcase

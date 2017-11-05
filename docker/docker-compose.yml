@@ -1,0 +1,10 @@
+#  Author: Mathias Kluba
+
+version: '2.1'
+services:
+  db4all:
+    image: grozeille/db4all:1.0
+    ports:
+      - 9800:9800
+      - 16010:16010
+      - 8983:8983

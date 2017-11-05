@@ -1,1 +1,1 @@
-java -Dloader.path=file://./etc -jar datalake-toolbox-*.jar
+java -Dloader.path=file://./etc -jar db4all-*.jar

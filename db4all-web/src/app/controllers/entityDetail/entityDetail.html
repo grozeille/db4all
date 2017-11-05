@@ -97,45 +97,7 @@
                   <fieldset>
                     <form style="padding: 0px;">
 
-                      <div class="row">
 
-                        <div class="col-sm-4">
-                          <div class="form-group">
-                            <label for="inputFieldName" class="control-label">Nom du champ</label>
-                            <input class="form-control" id="inputFieldName" placeholder="" ng-model="entityDetail.currentField.name" ng-disabled="!entityDetail.edition">
-                          </div>
-                        </div>
-                        <div class="col-sm-4">
-                          <div class="form-group">
-                            <label for="inputFieldName" class="control-label">Type du champ</label>
-                            <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="entityDetail.currentField.type" ng-disabled="!entityDetail.edition">
-                              <option value="TEXT">Text</option>
-                              <option value="NUMERIC">Numérique</option>
-                              <option value="DATE">Date</option>
-                              <option value="LINK">Lien Table</option>
-                              <option value="LINK_MULTIPLE">Lien Table Multiple</option>
-                            </select>
-                          </div>
-                        </div>
-
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <a id="saveField" type="button" class="btn btn-primary" ng-click="entityDetail.saveField()" ng-disabled="!entityDetail.edition">
-                            Sauvegarder
-                          </a>
-                          <a id="cancelField" type="button" class="btn btn-default" ng-click="entityDetail.cancelField()" ng-disabled="!entityDetail.edition">
-                            Annuler
-                          </a>
-
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-sm-12">
-
-                        </div>
-                      </div>
 
                       <div class="row" style="padding-top:20px;">
                         <div class="col-sm-12">
@@ -149,24 +111,38 @@
                             </thead>
                             <tbody>
                               <tr>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                  <a id="addNewField" type="button" class="btn btn-success" ng-click="entityDetail.addNewField()" ng-disabled="entityDetail.edition">
-                                    <span class="glyphicon glyphicon-plus"></span> Nouveau
-                                  </a>
+                                <td colspan="3">
+                                  <field-editor field="entityDetail.newField">
+                                    <a id="addNewField" type="button" class="btn btn-success" ng-click="entityDetail.addNewField()">
+                                      <span class="glyphicon glyphicon-plus"></span> Ajouter
+                                    </a>
+                                  </field-editor>
                                 </td>
                               </tr>
                               <tr ng-repeat="field in entityDetail.entity.fields track by $index">
-                                <td>
+                                <td colspan="3" ng-show="entityDetail.currentFieldIndex === $index">
+                                  <field-editor field="entityDetail.currentField">
+                                    <a id="saveField" type="button" class="btn btn-primary" ng-click="entityDetail.saveField()">
+                                      OK
+                                    </a>
+                                    <a id="cancelField" type="button" class="btn btn-default" ng-click="entityDetail.cancelField()">
+                                      Annuler
+                                    </a>
+                                  </field-editor>
+                                </td>
+                                <td ng-hide="entityDetail.currentFieldIndex === $index">
                                   {{field.name}}
                                 </td>
-                                <td>
+                                <td ng-hide="entityDetail.currentFieldIndex === $index">
                                   {{field.typeString}}
                                 </td>
-                                <td>
-                                  <button class="btn btn-primary" ng-click="entityDetail.editField($index)" >Editer</button>
-                                  <button class="btn btn-danger" ng-click="entityDetail.removeField($index)" >Supprimer</button>
+                                <td ng-hide="entityDetail.currentFieldIndex === $index">
+                                  <button class="btn btn-primary" ng-click="entityDetail.editField($index)" >
+                                    <span class="glyphicon glyphicon-pencil"></span>  Editer
+                                  </button>
+                                  <button class="btn btn-danger" ng-click="entityDetail.removeField($index)" >
+                                    <span class="glyphicon glyphicon-minus"></span>  Supprimer
+                                  </button>
                                 </td>
                               </tr>
                             </tbody>

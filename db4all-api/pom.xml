@@ -236,8 +236,16 @@
                 <version>${spring-boot.version}</version>
                 <configuration>  <!-- added -->
                     <skip>false</skip>
+                    <!--<mainClass>fr.grozeille.db4all.Application</mainClass>-->
                     <layout>ZIP</layout> <!-- to use PropertiesLaunchar -->
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
 			</plugin>
 
             <plugin>
@@ -245,7 +253,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptor>src/main/assembly/dist.xml</descriptor>
-                    <finalName>scuba-${project.version}</finalName>
+                    <finalName>db4all-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>
