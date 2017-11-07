@@ -1,1 +1,0 @@
-java -Dloader.path=file://./etc -jar db4all-*.jar

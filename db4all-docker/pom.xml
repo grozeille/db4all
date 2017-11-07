@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>db4all</artifactId>
+        <groupId>fr.grozeille</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>db4all-docker</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.version>${project.version}</project.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>fr.grozeille</groupId>
+            <artifactId>db4all-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.7</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.23.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>false</skip>
+                            <images>
+                                <image>
+                                    <name>grozeille/db4all:${project.version}</name>
+                                    <alias>db4all</alias>
+                                    <build>
+                                        <!-- filter>@</filter-->
+                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                                        <assembly>
+                                            <inline>
+                                                <id>db4all</id>
+                                                <dependencySets>
+                                                    <dependencySet>
+                                                        <includes>
+                                                            <include>fr.grozeille:db4all-api</include>
+                                                        </includes>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <outputFileNameMapping>db4all.jar</outputFileNameMapping>
+                                                    </dependencySet>
+                                                </dependencySets>
+                                            </inline>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <port>9800:9800</port>
+                                            <port>16010:16010</port>
+                                            <port>8983:8983</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

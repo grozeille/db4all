@@ -1,0 +1,36 @@
+server:
+  port: 9800
+
+logging.level.org.hibernate.SQL: debug
+logging.level.org.apache.hadoop.yarn.util.RackResolver: warn
+
+
+spring:
+  jackson.serialization.write_dates_as_timestamps: false
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 500Mb
+      max-request-size: 550Mb
+
+db4all:
+  adminToken: e5e68d89adc641b2946b6c770c4fd7c7e23f278e
+  solr:
+    zkUrl: localhost:9983
+  hbase:
+    zkUrl: localhost:2181
+
+
+security:
+  enabled: false
+  oauth2:
+    client:
+      clientId: e033f4f194da5c694fbf
+      clientSecret: 338add3c473502b1e4a8bc270ae1d88ba3d0e80e
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user

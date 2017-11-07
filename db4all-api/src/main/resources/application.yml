@@ -14,11 +14,11 @@ spring:
       max-request-size: 550Mb
 
 db4all:
-  adminToken: e5e68d89adc641b2946b6c770c4fd7c7e23f278e
+  adminToken:
   solr:
-    zkUrl: localhost:9983
+    zkUrl:
   hbase:
-    zkUrl: localhost:2181
+    zkUrl:
 
 
 security:
@@ -27,10 +27,10 @@ security:
     client:
       clientId:
       clientSecret:
-      accessTokenUri: https://github.com/login/oauth/access_token
-      userAuthorizationUri: https://github.com/login/oauth/authorize
-      tokenName: oauth_token
-      authenticationScheme: query
-      clientAuthenticationScheme: form
+      accessTokenUri:
+      userAuthorizationUri:
+      tokenName:
+      authenticationScheme:
+      clientAuthenticationScheme:
     resource:
-      userInfoUri: https://api.github.com/user
+      userInfoUri:

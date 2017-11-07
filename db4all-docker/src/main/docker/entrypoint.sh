@@ -30,7 +30,7 @@ if [ "$(whoami)" = "root" ]; then
         /solr-start.sh
 EOF
 else
-    /solr-start.sh
+    solr-start.sh
 fi
 
 sleep 180
@@ -47,4 +47,6 @@ curl "http://localhost:8983/solr/admin/collections?action=RELOAD&name=entity"
 
 
 echo "Starting DB4ALL"
-java -jar /db4all-api-1.0-SNAPSHOT.jar
+cd /db4all
+chmod +x ./start.sh
+./start.sh

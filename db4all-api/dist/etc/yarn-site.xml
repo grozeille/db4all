@@ -1,8 +1,0 @@
-<configuration>
-
-    <property>
-        <name>yarn.resourcemanager.address</name>
-        <value>localhost:37001</value>
-    </property>
-
-</configuration>

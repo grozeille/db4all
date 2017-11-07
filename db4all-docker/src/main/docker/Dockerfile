@@ -1,4 +1,5 @@
 # Author: Mathias Kluba
+# Inspired from https://hub.docker.com/r/harisekhon/hbase/
 
 FROM alpine:latest
 MAINTAINER Mathias Kluba
@@ -62,7 +63,7 @@ COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
 
 RUN mkdir -p /solr-conf
-COPY solr-home /solr-conf/
+COPY solr-conf /solr-conf/
 COPY solr-start.sh /
 RUN set -euxo pipefail && \
     adduser -S -s /bin/bash solr && \
@@ -71,7 +72,9 @@ RUN set -euxo pipefail && \
 
 COPY profile.d/java.sh /etc/profile.d/
 
-COPY "db4all-api-1.0-SNAPSHOT.jar" ./
+RUN mkdir -p /db4all
+COPY db4all ./db4all/
+COPY maven/ ./db4all/
 
 EXPOSE 8983 16010 9800
 
