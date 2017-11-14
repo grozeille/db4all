@@ -40,6 +40,9 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     else if(type === 'DATE') {
       return 'Date';
     }
+    else if(type === 'BOOL') {
+      return 'Vrai/Faux';
+    }
     else if(type === 'LINK') {
       return 'Lien Table';
     }
@@ -100,9 +103,11 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
       name: '',
       type: 'TEXT'
     };
+    vm.newField.typeString = toTextType(vm.newField.type);
   }
 
   vm.addNewField = function() {
+    vm.newField.typeString = toTextType(vm.newField.type);
     vm.entity.fields.unshift(vm.newField);
     resetNewField();
   };
