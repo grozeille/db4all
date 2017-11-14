@@ -37,6 +37,9 @@ public class EntityDataRepository {
 
     private final String cfData = "cfData";
 
+    private final String colDummy = "#dummy#";
+    private final byte[] colDummyBytes = Bytes.toBytes(colDummy);
+
     public void save(String projectId, String entityId, EntityData data) throws Exception {
         createTable(projectId, entityId);
 
@@ -58,6 +61,9 @@ public class EntityDataRepository {
                         put.addColumn(cfDataBytes, Bytes.toBytes(entry.getKey()), null);
                     }
                 }
+
+                // to be able to save empty rows
+                put.addColumn(cfDataBytes, colDummyBytes, null);
 
                 puts.add(put);
 

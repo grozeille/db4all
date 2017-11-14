@@ -81,7 +81,7 @@ public class EntityResource {
                 request.getName(),
                 request.getComment(),
                 request.getTags(),
-                new EntityField[0]));
+                request.getFields()));
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/project/{project}/entity/{entity}")
