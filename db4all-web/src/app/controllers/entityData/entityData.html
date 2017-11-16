@@ -63,7 +63,7 @@
                  col-headers="true"
                  min-spare-rows="1"
                  datarows="entityData.filteredData">
-        <hot-column data-ng-repeat="field in entityData.entity.fields" data="{{field.name}}" title="field.name"></hot-column>
+        <hot-column data-ng-repeat="col in entityData.columns" data="{{col.name}}" title="col.name" editor="col.editor"></hot-column>
 
       </hot-table>
     </div>

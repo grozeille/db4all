@@ -1,0 +1,26 @@
+<div class="modal-header" style="margin-bottom:30px;">
+    <h3 class="modal-title">Choisir des éléments</h3>
+  </div>
+  <div class="modal-body">
+  
+    <div class="row">
+  
+      <!-- Left table -->
+      <div class="col-sm-12">
+        <hot-table settings="links.settings"
+          row-headers="true"
+          col-headers="true"
+          min-spare-rows="1"
+          datarows="links.filteredData">
+        <hot-column data-ng-repeat="col in links.columns" data="{{col.name}}" title="col.name" editor="col.editor"></hot-column>
+
+        </hot-table>
+      </div>
+  
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="links.ok()">OK</button>
+    <button class="btn btn-default" type="button" ng-click="links.cancel()">Cancel</button>
+  </div>
+  

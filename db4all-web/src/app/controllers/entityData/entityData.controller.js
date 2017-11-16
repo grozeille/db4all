@@ -6,8 +6,10 @@ module.exports = {
   template: require('./entityData.html')
 };
 
+var Handsontable = require('Handsontable');
+
 /** @ngInject */
-function EntityDataController($log, $uibModal, $stateParams, entityService) {
+function EntityDataController($log, $uibModal, $stateParams, $document, entityService) {
   var vm = this;
 
   vm.alerts = [];
@@ -21,12 +23,18 @@ function EntityDataController($log, $uibModal, $stateParams, entityService) {
     tags: [],
     fields: []
   };
+  vm.fields = {};
   vm.filteredData = [];
   vm.data = [];
+  vm.columns = [];
   vm.settings = {
     manualColumnResize: true,
+    allowInvalid: false,
     contextMenu: ['row_above', 'row_below', 'remove_row']
   };
+
+  vm.linkEditor = {};
+  vm.PasswordEditor = {};
 
   vm.queryGroup = {operator: 'ET', rules: []};
   vm.filterOpen = false;
@@ -38,6 +46,39 @@ function EntityDataController($log, $uibModal, $stateParams, entityService) {
         if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
           vm.entity.fields = [];
         }
+
+        vm.columns = [];
+        for(var cptField in vm.entity.fields) {
+          var field = vm.entity.fields[cptField];
+
+          vm.fields[field.name] = field;
+
+          var column = {
+            name: field.name
+          };
+
+          // TEXT,NUMERIC,DATE,BOOL,LINK,LINK_MULTIPLE
+          if(field.type === 'TEXT') {
+            column.editor = 'text';
+          }
+          else if(field.type === 'NUMERIC') {
+            column.editor = 'numeric';
+          }
+          else if(field.type === 'DATE') {
+            column.editor = 'date';
+          }
+          else if(field.type === 'BOOL') {
+            column.editor = 'checkbox';
+          }
+          else if(field.type === 'LINK') {
+            column.editor = vm.linkEditor;
+          }
+          else if(field.type === 'LINK_MULTIPLE') {
+            column.editor = vm.linkEditor;
+          }
+          vm.columns.push(column);
+        }
+
         return entityService.getData(vm.projectId, vm.entityId).then(function (data) {
           vm.data = data;
           vm.filteredData = vm.data;
@@ -248,8 +289,107 @@ function EntityDataController($log, $uibModal, $stateParams, entityService) {
   }
 
   function activate() {
+    vm.PasswordEditor = Handsontable.editors.TextEditor.prototype.extend();
+
+    vm.PasswordEditor.prototype.createElements = function () {
+      // Call the original createElements method
+      Handsontable.editors.TextEditor.prototype.createElements.apply(this, arguments);
+
+      // Create password input and update relevant properties
+      this.TEXTAREA = $document[0].createElement('input');
+      this.TEXTAREA.setAttribute('type', 'password');
+      this.TEXTAREA.className = 'handsontableInput';
+      this.textareaStyle = this.TEXTAREA.style;
+      this.textareaStyle.width = 0;
+      this.textareaStyle.height = 0;
+
+      // Replace textarea with password input
+      Handsontable.dom.empty(this.TEXTAREA_PARENT);
+      this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
+    };
+
+    vm.linkEditor = Handsontable.editors.BaseEditor.prototype.extend();
+
+    vm.linkEditor.prototype.init = function () {
+      this.button = $document[0].createElement('button');
+      this.button.innerHTML = '...';
+      Handsontable.dom.addClass(this.button, 'btn btn-primary btn-xs htLinkEditor');
+      this.button.style.display = 'none';
+
+      this.instance.rootElement.appendChild(this.button);
+    };
+    vm.linkEditor.prototype.getValue = function() {
+      return this.button.value;
+    };
+
+    vm.linkEditor.prototype.setValue = function(value) {
+      this.button.value = value;
+    };
+
+    vm.linkEditor.prototype.prepare = function() {
+      Handsontable.editors.BaseEditor.prototype.prepare.apply(this, arguments);
+      // Handsontable.dom.empty(this.button);
+    };
+
+    vm.linkEditor.prototype.open = function() {
+      var width = Handsontable.dom.outerWidth(this.TD);
+      var height = Handsontable.dom.outerHeight(this.TD);
+      var rootOffset = Handsontable.dom.offset(this.instance.rootElement);
+      var tdOffset = Handsontable.dom.offset(this.TD);
+
+      // sets select dimensions to match cell size
+      this.button.style.height = height + 'px';
+      this.button.style.minWidth = width + 'px';
+
+      // make sure that list positions matches cell position
+      this.button.style.top = tdOffset.top - rootOffset.top + 'px';
+      this.button.style.left = tdOffset.left - rootOffset.left + 'px';
+      this.button.style.margin = '0px';
+
+      // display the list
+      this.button.style.display = '';
+
+      var field = vm.fields[this.prop];
+      var linkProjectId = field.projectId;
+      var linkEntityId = field.entityId;
+      var links = vm.filteredData[this.row][this.prop];
+      if(links === '' || angular.isUndefined(links)) {
+        links = [];
+      }
+      vm.links(linkProjectId, linkEntityId, links);
+    };
+
+    vm.linkEditor.prototype.close = function() {
+      this.button.style.display = 'none';
+    };
+
+    vm.linkEditor.prototype.focus = function() {
+    };
+
     vm.refresh();
   }
+
+  var linksModal = require('./links/links.controller');
+
+  // entityService, projectId, entityId, links
+  vm.links = function(linkProjectId, linkEntityId, links) {
+    linksModal.size = 'lg';
+    linksModal.resolve = {
+      entityService: function () {
+        return entityService;
+      },
+      projectId: function () {
+        return linkProjectId;
+      },
+      entityId: function () {
+        return linkEntityId;
+      },
+      links: function () {
+        return links;
+      }
+    };
+    $uibModal.open(linksModal);
+  };
 
   activate();
 }
