@@ -61,7 +61,8 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
   vm.ok = function() {
     $log.info('Modal OK at: ' + new Date());
 
-    $uibModalInstance.close();
+    // $uibModalInstance.close(vm.links);
+    $uibModalInstance.close([new Date(), 'aaa']);
   };
 
   vm.cancel = function() {

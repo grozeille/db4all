@@ -10,6 +10,7 @@ module.exports = {
 function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   var vm = this;
 
+  vm.saving = false;
   vm.alerts = [];
 
   vm.projectId = $stateParams.projectId;
@@ -26,6 +27,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   vm.currentField = null;
   vm.currentFieldIndex = -1;
   vm.newField = {
+    fieldId: 0,
     name: '',
     type: 'TEXT'
   };
@@ -51,6 +53,15 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     }
   }
 
+  function refreshFields() {
+    if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
+      vm.entity.fields = [];
+    }
+    for(var cptField in vm.entity.fields) {
+      vm.entity.fields[cptField].typeString = toTextType(vm.entity.fields[cptField].type);
+    }
+  }
+
   vm.refresh = function() {
     if(vm.entityId !== '') {
       entityService.getById(vm.projectId, vm.entityId)
@@ -60,12 +71,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
           for(var cptTags in vm.entity.tags) {
             vm.tags.push({text: vm.entity.tags[cptTags]});
           }
-          if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
-            vm.entity.fields = [];
-          }
-          for(var cptField in vm.entity.fields) {
-            vm.entity.fields[cptField].typeString = toTextType(vm.entity.fields[cptField].type);
-          }
+          refreshFields();
         })
         .catch(function(error) {
           vm.alerts.push({msg: 'Unable to get entity ' + vm.entityId + '.', type: 'danger'});
@@ -75,6 +81,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   };
 
   vm.save = function() {
+    vm.saving = true;
     vm.entity.tags = [];
     for(var cpt = 0; cpt < vm.tags.length; cpt++) {
       vm.entity.tags.push(vm.tags[cpt].text);
@@ -84,9 +91,12 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
       .then(function(request) {
         vm.entityId = request.data.id;
         vm.entity = request.data;
+        refreshFields();
         vm.alerts.push({msg: 'Entity saved.', type: 'info'});
+        vm.saving = false;
       })
       .catch(function(error) {
+        vm.saving = false;
         if(vm.entityId) {
           vm.alerts.push({msg: 'Unable to save entity ' + vm.entityId + '.', type: 'danger'});
         }
@@ -100,6 +110,7 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   function resetNewField() {
     vm.currentFieldIndex = -1;
     vm.newField = {
+      fieldId: 0,
       name: '',
       type: 'TEXT'
     };
@@ -107,8 +118,17 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   }
 
   vm.addNewField = function() {
+    var maxFieldId = 0;
+    for(var fieldCpt in vm.entity.fields) {
+      var field = vm.entity.fields[fieldCpt];
+      if(field.fieldId > maxFieldId) {
+        maxFieldId = field.fieldId;
+      }
+    }
+
+    vm.newField.fieldId = maxFieldId + 1;
     vm.newField.typeString = toTextType(vm.newField.type);
-    vm.entity.fields.unshift(vm.newField);
+    vm.entity.fields.push(vm.newField);
     resetNewField();
   };
 
@@ -129,6 +149,24 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
 
   vm.removeField = function(index) {
     vm.entity.fields.splice(index, 1);
+  };
+
+  vm.moveFieldUp = function(index) {
+    if(index === 0) {
+      return;
+    }
+    var field = vm.entity.fields[index];
+    vm.removeField(index);
+    vm.entity.fields.splice(index - 1, 0, field);
+  };
+
+  vm.moveFieldDown = function(index) {
+    if(index === vm.entity.fields.length - 1) {
+      return;
+    }
+    var field = vm.entity.fields[index];
+    vm.removeField(index);
+    vm.entity.fields.splice(index + 1, 0, field);
   };
 
   function activate() {

@@ -17,8 +17,17 @@ require('angular-sanitize');
 require('font-awesome-loader');
 require('ace-builds/src-min-noconflict/ace');
 require('angular-ui-ace');
+
+require('handsontable/dist/moment/moment');
+require('handsontable/dist/numbro/numbro');
+require('handsontable/dist/numbro/languages');
+
+require('handsontable/dist/pikaday/pikaday');
+require('handsontable/dist/pikaday/pikaday.css');
+
 require('handsontable/dist/handsontable.full');
 require('handsontable/dist/handsontable.full.css');
+
 require('ng-handsontable/dist/ngHandsontable');
 
 angular

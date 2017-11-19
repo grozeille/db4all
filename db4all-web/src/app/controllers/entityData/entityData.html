@@ -55,16 +55,25 @@
     </div>
   </div>
 
+  <div class="row fill-height-substract">
+    <div class="col-sm-12">
+      <pre><b>Sélection:</b> {{entityData.currentColumn}}</pre>
+    </div>
+  </div>
+
   <div class="row">
 
     <div class="col-sm-12"  fill-height="fill-height-substract">
-      <hot-table settings="entityData.settings"
+      <hot-table hot-id="entity-handsontable"
+                 settings="entityData.settings"
                  row-headers="true"
                  col-headers="true"
+                 col-widths="entityData.colWidths"
                  min-spare-rows="1"
-                 datarows="entityData.filteredData">
-        <hot-column data-ng-repeat="col in entityData.columns" data="{{col.name}}" title="col.name" editor="col.editor"></hot-column>
-
+                 datarows="entityData.filteredData"
+                 columns="entityData.columns"
+                 on-after-selection="entityData.onAfterSelection">
+        
       </hot-table>
     </div>
   </div>

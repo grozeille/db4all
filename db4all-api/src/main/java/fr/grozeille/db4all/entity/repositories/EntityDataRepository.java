@@ -1,8 +1,11 @@
 package fr.grozeille.db4all.entity.repositories;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 import fr.grozeille.db4all.entity.model.Entity;
 import fr.grozeille.db4all.entity.model.EntityData;
 import fr.grozeille.db4all.entity.model.EntityField;
+import fr.grozeille.db4all.entity.model.EntityFieldType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
@@ -20,6 +23,7 @@ import org.springframework.data.hadoop.hbase.TableCallback;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -40,8 +44,16 @@ public class EntityDataRepository {
     private final String colDummy = "#dummy#";
     private final byte[] colDummyBytes = Bytes.toBytes(colDummy);
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public void save(String projectId, String entityId, EntityData data) throws Exception {
         createTable(projectId, entityId);
+
+        Entity entity = entityRepository.findOne(projectId, entityId);
+        Map<Integer, EntityFieldType> fieldTypes = new HashMap<>();
+        for(EntityField f : entity.getFields()) {
+            fieldTypes.put(f.getFieldId(), f.getType());
+        }
 
         String name = projectId + "_" + entityId;
         Integer lastRowId = hbaseTemplate.execute(name, table -> {
@@ -54,12 +66,76 @@ public class EntityDataRepository {
 
                 Put put = new Put(Bytes.toBytes(rowId));
                 for(Map.Entry<String, Object> entry : map.entrySet()) {
-                    if(entry.getValue() != null) {
-                        put.addColumn(cfDataBytes, Bytes.toBytes(entry.getKey()), Bytes.toBytes(entry.getValue().toString()));
+
+                    Integer columnId = Integer.parseInt(entry.getKey());
+                    byte[] columnValue;
+
+                    EntityFieldType fieldType = fieldTypes.get(columnId);
+                    if(fieldType == EntityFieldType.BOOL) {
+                        if(entry.getValue().getClass().equals(boolean.class)) {
+                            columnValue = Bytes.toBytes((boolean)entry.getValue());
+                        }
+                        else if(entry.getValue() == null) {
+                            columnValue = Bytes.toBytes(false);
+                        }
+                        else {
+                            try {
+                                columnValue = Bytes.toBytes(Boolean.parseBoolean(entry.getValue().toString()));
+                            }catch(Exception ex) {
+                                columnValue = Bytes.toBytes(false);
+                                log.error("Unable to parse column "+columnId+" as boolean");
+                            }
+                        }
+                    }
+                    else if(fieldType == EntityFieldType.NUMERIC) {
+                        if(entry.getValue().getClass().equals(double.class)) {
+                            columnValue = Bytes.toBytes((double)entry.getValue());
+                        }
+                        else if(entry.getValue().getClass().equals(int.class)) {
+                            columnValue = Bytes.toBytes((double)((int)entry.getValue()));
+                        }
+                        else if(entry.getValue() == null) {
+                            columnValue = Bytes.toBytes(0.0);
+                        }
+                        else {
+                            try {
+                                columnValue = Bytes.toBytes(Double.parseDouble(entry.getValue().toString()));
+                            }catch(Exception ex) {
+                                columnValue = Bytes.toBytes(false);
+                                log.error("Unable to parse column "+columnId+" as numeric");
+                            }
+                        }
+                    }
+                    else if(fieldType == EntityFieldType.LINK || fieldType == EntityFieldType.LINK_MULTIPLE) {
+                        if(entry.getValue().getClass().equals(String[].class)) {
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString((String[])entry.getValue()));
+                        }
+                        else if(entry.getValue() instanceof Iterable) {
+                            String[] array = Iterables.toArray((Iterable)entry.getValue(), String.class);
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(array));
+                        }
+                        else if(entry.getValue() == null) {
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new String[0]));
+                        }
+                        else {
+                            try {
+                                columnValue = Bytes.toBytes(entry.getValue().toString());
+                            }catch(Exception ex) {
+                                columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new String[0]));
+                                log.error("Unable to parse column "+columnId+" as array");
+                            }
+                        }
                     }
                     else {
-                        put.addColumn(cfDataBytes, Bytes.toBytes(entry.getKey()), null);
+                        if(entry.getValue() == null) {
+                            columnValue = Bytes.toBytes("");
+                        }
+                        else {
+                            columnValue = Bytes.toBytes(entry.getValue().toString());
+                        }
                     }
+
+                    put.addColumn(cfDataBytes, Bytes.toBytes(entry.getKey()), columnValue);
                 }
 
                 // to be able to save empty rows
@@ -109,10 +185,13 @@ public class EntityDataRepository {
 
         createTable(projectId, entityId);
 
+        Map<String, EntityFieldType> fieldTypes = new HashMap<>();
+
         HashSet<String> columns = new HashSet<>();
         Entity entity = entityRepository.findOne(projectId, entityId);
         for(EntityField f : entity.getFields()) {
-            columns.add(f.getName());
+            columns.add(Integer.toString(f.getFieldId()));
+            fieldTypes.put(Integer.toString(f.getFieldId()), f.getType());
         }
 
         String name = projectId + "_" + entityId;
@@ -133,11 +212,41 @@ public class EntityDataRepository {
                     byte[] valueBytes = Bytes.copy(cell.getValueArray(),
                             cell.getValueOffset(),
                             cell.getValueLength());
-                    String columnName = Bytes.toString(columnNameBytes);
-                    String columnValue = Bytes.toString(valueBytes);
+                    String columnId = Bytes.toString(columnNameBytes);
+                    Object columnValue;
 
-                    if(columns.contains(columnName)) {
-                        row.put(columnName, columnValue);
+                    EntityFieldType fieldType = fieldTypes.get(columnId);
+                    if(fieldType == EntityFieldType.BOOL) {
+                        try {
+                            columnValue = Bytes.toBoolean(valueBytes);
+                        }catch(Exception ex) {
+                            columnValue = false;
+                            log.error("Unable to parse column "+columnId+" as boolean");
+                        }
+                    }
+                    else if(fieldType == EntityFieldType.NUMERIC) {
+                        try {
+                            columnValue = Bytes.toDouble(valueBytes);
+                        }catch(Exception ex) {
+                            columnValue = 0.0;
+                            log.error("Unable to parse column "+columnId+" as numeric");
+                        }
+                    }
+                    else if(fieldType == EntityFieldType.LINK || fieldType == EntityFieldType.LINK_MULTIPLE) {
+                        try {
+                            columnValue = objectMapper.readValue(Bytes.toString(valueBytes), String[].class);
+                        }catch(Exception ex) {
+                            columnValue = new String[0];
+                            log.error("Unable to parse column "+columnId+" as array");
+                        }
+                    }
+                    else {
+                        columnValue = Bytes.toString(valueBytes);
+                    }
+
+
+                    if(columns.contains(columnId)) {
+                        row.put(columnId, columnValue);
                     }
                 }
             } catch (IOException e) {

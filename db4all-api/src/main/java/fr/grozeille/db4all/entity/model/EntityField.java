@@ -8,7 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntityField {
+    private int fieldId;
+
     private String name;
+
+    private int width;
 
     private EntityFieldType type;
 }
