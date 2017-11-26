@@ -146,14 +146,23 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
   function testRule(row, rule) {
     var condition = rule.condition;
-    var field = rule.field.name;
+    var field = rule.field.fieldId;
     var value = row[field];
 
+    if(rule.field.type === 'BOOL') {
+      if(value === true) {
+        value = 'vrai';
+      }
+      else {
+        value = 'faux';
+      }
+    }
+
     if(condition === '=') {
-      return value === rule.data;
+      return String(value) === rule.data;
     }
     else if(condition === '!=') {
-      return value !== rule.data;
+      return String(value) !== rule.data;
     }
     else if(condition === '<') {
       return parseFloat(value) < parseFloat(rule.data);
