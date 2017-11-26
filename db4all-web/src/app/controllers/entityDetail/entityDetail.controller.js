@@ -25,12 +25,20 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   vm.tags = [];
 
   vm.currentField = null;
+  vm.currentLinkEntity = null;
+  vm.currentLinkField = null;
   vm.currentFieldIndex = -1;
   vm.newField = {
     fieldId: 0,
     name: '',
-    type: 'TEXT'
+    type: 'TEXT',
+    format: '0.00',
+    maxLength: 0
   };
+  vm.newLinkEntity = null;
+  vm.newLinkField = null;
+
+  vm.allEntities = [];
 
   function toTextType(type) {
     if(type === 'TEXT') {
@@ -62,6 +70,13 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     }
   }
 
+  vm.refreshEntities = function(filter) {
+    return entityService.getAllEntities(vm.projectId, filter, 0, 20)
+    .then(function(data) {
+      vm.allEntities = data.content;
+    });
+  };
+
   vm.refresh = function() {
     if(vm.entityId !== '') {
       entityService.getById(vm.projectId, vm.entityId)
@@ -72,6 +87,8 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
             vm.tags.push({text: vm.entity.tags[cptTags]});
           }
           refreshFields();
+
+          vm.refreshEntities('');
         })
         .catch(function(error) {
           vm.alerts.push({msg: 'Unable to get entity ' + vm.entityId + '.', type: 'danger'});
@@ -112,9 +129,13 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     vm.newField = {
       fieldId: 0,
       name: '',
-      type: 'TEXT'
+      type: 'TEXT',
+      format: '0.00',
+      maxLength: 0
     };
     vm.newField.typeString = toTextType(vm.newField.type);
+    vm.newLinkEntity = null;
+    vm.newLinkField = null;
   }
 
   vm.addNewField = function() {
@@ -136,15 +157,34 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     vm.currentField.typeString = toTextType(vm.currentField.type);
     vm.entity.fields[vm.currentFieldIndex] = vm.currentField;
     vm.currentFieldIndex = -1;
+
+    vm.currentLinkEntity = null;
+    vm.currentLinkField = null;
   };
 
   vm.cancelField = function() {
     vm.currentFieldIndex = -1;
+
+    vm.currentLinkEntity = null;
+    vm.currentLinkField = null;
   };
 
   vm.editField = function(index) {
     vm.currentField = angular.copy(vm.entity.fields[index]);
     vm.currentFieldIndex = index;
+
+    if(vm.currentField.type === 'LINK' || vm.currentField.type === 'LINK_MULTIPLE') {
+      entityService.getById(vm.projectId, vm.currentField.entityId).then(function(data) {
+        vm.currentLinkEntity = data;
+        for(var fieldCpt in vm.currentLinkEntity.fields) {
+          var field = vm.currentLinkEntity.fields[fieldCpt];
+          if(field.fieldId === vm.currentField.entityField) {
+            vm.currentLinkField = field;
+            break;
+          }
+        }
+      });
+    }
   };
 
   vm.removeField = function(index) {

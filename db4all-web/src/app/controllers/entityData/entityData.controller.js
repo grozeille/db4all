@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function EntityDataController($scope, $log, $uibModal, $stateParams, $document, entityService, hotRegisterer) {
+function EntityDataController($scope, $log, $uibModal, $stateParams, $document, entityService, hotRegisterer, hotkeys) {
   var vm = this;
 
   vm.alerts = [];
@@ -74,11 +74,17 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
           // TEXT,NUMERIC,DATE,BOOL,LINK,LINK_MULTIPLE
           if(field.type === 'TEXT') {
             column.editor = 'text';
-            column.renderer = 'text';
+            column.renderer = vm.maxLengthTextRenderer;
+            if(angular.isDefined(field.maxLength)) {
+              column.maxLength = field.maxLength;
+            }
+            else {
+              column.maxLength = 0;
+            }
           }
           else if(field.type === 'NUMERIC') {
             column.editor = 'numeric';
-            column.format = '0.00';
+            column.format = field.format;
             column.renderer = 'numeric';
           }
           else if(field.type === 'DATE') {
@@ -330,7 +336,11 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     Handsontable.renderers.BaseRenderer.apply(this, arguments);
 
     if(angular.isDefined(value) && value !== null && value instanceof Array) {
-      td.innerHTML = value.join(', ');
+      var linkValue = [];
+      for(var linkCpt in value) {
+        linkValue.push(value[linkCpt].display);
+      }
+      td.innerHTML = linkValue.join(', ');
     }
 
     return td;
@@ -347,7 +357,20 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
       }
     }
     else if(field.type === 'LINK' || field.type === 'LINK_MULTIPLE') {
-      vm.currentColumn = this.getDataAtCell(row, column).join(', ');
+      if(this.getDataAtCell(row, column) === null) {
+        vm.currentColumn = '';
+      }
+      else if(this.getDataAtCell(row, column) === '') {
+        vm.currentColumn = '';
+      }
+      else {
+        var linkValue = [];
+        var value = this.getDataAtCell(row, column);
+        for(var linkCpt in value) {
+          linkValue.push(value[linkCpt].display);
+        }
+        vm.currentColumn = linkValue.join(', ');
+      }
     }
     else {
       vm.currentColumn = this.getDataAtCell(row, column);
@@ -360,7 +383,10 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
     vm.linkEditor.prototype.init = function () {
       this.linksModal = require('./links/links.controller');
-      this.linksModal.size = 'lg';
+      this.linksModal.size = 'wide';
+      this.linksModal.appendTo = angular.element($document.find('#modal-link'));
+      // angular.element('#modal-link')[0];
+      this.linksModal.windowClass = 'modal-window-wide';
       this.linksModal.resolve = {};
     };
 
@@ -369,19 +395,18 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     };
 
     vm.linkEditor.prototype.setValue = function(value) {
-      this.value = value;
-
-      if(value === '' || angular.isUndefined(value)) {
-        value = [];
+      if(this.originalValue === '' || angular.isUndefined(this.originalValue)) {
+        this.originalValue = [];
       }
 
       var field = vm.fields[this.prop];
-      var linkProjectId = field.projectId;
+      var linkProjectId = vm.projectId;
       var linkEntityId = field.entityId;
+      var originalValue = this.originalValue;
 
-      this.linksModal.resolve.entityService = function () {
+      /* this.linksModal.resolve.entityService = function () {
         return entityService;
-      };
+      }; */
       this.linksModal.resolve.projectId = function () {
         return linkProjectId;
       };
@@ -389,7 +414,10 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
         return linkEntityId;
       };
       this.linksModal.resolve.links = function () {
-        return value;
+        return originalValue;
+      };
+      this.linksModal.resolve.sourceField = function () {
+        return field;
       };
     };
 
@@ -414,6 +442,29 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
     vm.linkEditor.prototype.focus = function() {
     };
+
+    vm.maxLengthTextRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+      var escaped = Handsontable.helper.stringify(value);
+      var maxLength = instance.getCellMeta(row, col).maxLength;
+
+      if(maxLength > 0 && escaped.length > maxLength) {
+        escaped = escaped.substring(0, maxLength) + '...';
+      }
+
+      td.innerHTML = escaped;
+
+      return td;
+    };
+
+    hotkeys.bindTo($scope)
+    .add({
+      combo: 'mod+s',
+      description: 'Save',
+      callback: function(event, hotkey) {
+        event.preventDefault();
+        vm.save();
+      }
+    });
 
     vm.refresh();
   }

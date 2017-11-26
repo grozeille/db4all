@@ -9,6 +9,7 @@
   "dependencies": {
     "ace-builds": "^1.2.8",
     "angular": "^1.6.2",
+    "angular-hotkeys": "^1.7.0",
     "angular-ui-ace": "^0.2.3",
     "angular-ui-bootstrap": "2.0.0",
     "angular-ui-grid": "3.2.9",

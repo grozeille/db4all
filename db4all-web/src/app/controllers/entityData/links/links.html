@@ -7,13 +7,15 @@
   
       <!-- Left table -->
       <div class="col-sm-12">
-        <hot-table settings="links.settings"
-          row-headers="true"
-          col-headers="true"
-          min-spare-rows="1"
-          datarows="links.filteredData">
-        <hot-column data-ng-repeat="col in links.columns" data="{{col.name}}" title="col.name" editor="col.editor"></hot-column>
-
+        <hot-table
+                hot-id="link-handsontable"
+                settings="links.settings"
+                row-headers="true"
+                col-headers="true"
+                col-widths="links.colWidths"
+                min-spare-rows="0"
+                datarows="links.filteredData"
+                columns="links.columns">
         </hot-table>
       </div>
   
@@ -23,4 +25,4 @@
     <button class="btn btn-primary" type="button" ng-click="links.ok()">OK</button>
     <button class="btn btn-default" type="button" ng-click="links.cancel()">Cancel</button>
   </div>
-  
+</div>

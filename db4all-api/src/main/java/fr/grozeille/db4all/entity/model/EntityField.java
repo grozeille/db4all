@@ -15,4 +15,12 @@ public class EntityField {
     private int width;
 
     private EntityFieldType type;
+
+    private String format;
+
+    private String entityId;
+
+    private int entityField;
+
+    private int maxLength;
 }

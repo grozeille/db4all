@@ -13,9 +13,9 @@ public interface EntitySearchItemRepository extends SolrCrudRepository<EntitySea
     @Query(value = "projectId:?0")
     Page<EntitySearchItem> findAllByProject(Pageable pageable, String projectId);
 
-    @Query(value = "text:'?0' AND projectId:?1")
+    @Query(value = "text:*?0* AND projectId:?1")
     Page<EntitySearchItem> findAllByProject(Pageable pageable, String filter, String projectId);
 
-    @Query(value = "text:?0")
+    @Query(value = "text:*?0*")
     Page<EntitySearchItem> findAll(Pageable pageable, String filter);
 }

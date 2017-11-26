@@ -30,6 +30,9 @@ require('handsontable/dist/handsontable.full.css');
 
 require('ng-handsontable/dist/ngHandsontable');
 
+require('angular-hotkeys/build/hotkeys.min');
+require('angular-hotkeys/build/hotkeys.min.css');
+
 angular
   .module('datalakeToolbox', [
     'ui.bootstrap',
@@ -42,7 +45,8 @@ angular
     'ngSanitize',
     'ngTagsInput',
     'ngFileUpload',
-    'ngHandsontable']);
+    'ngHandsontable',
+    'cfp.hotkeys']);
 
 require('./directives');
 require('./services');

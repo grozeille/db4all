@@ -9,6 +9,7 @@
   <div class="col-sm-4">
     <div class="form-group">
       <label for="inputFieldName" class="control-label">Type du champ</label>
+      <div ng-show="canChangeType">
       <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="field.type">
         <option value="TEXT">Text</option>
         <option value="NUMERIC">Numérique</option>
@@ -17,6 +18,56 @@
         <option value="LINK">Lien Table</option>
         <option value="LINK_MULTIPLE">Lien Table Multiple</option>
       </select>
+      </div>
+      <div ng-show="!canChangeType">
+      <input class="form-control" id="inputFieldTypeReadOnly" value="{{fieldTypeText(field.type)}}" disabled="disabled">
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="row" ng-show="field.type === 'NUMERIC'">
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label for="inputFieldNumericFormat" class="control-label">Format</label>
+      <input class="form-control" id="inputFieldNumericFormat" placeholder="0.00" ng-model="field.format">
+    </div>
+  </div>
+</div>
+<div class="row" ng-show="field.type === 'TEXT'">
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label for="inputFieldTextMaxLength" class="control-label">Taille max (affichage)</label>
+      <input class="form-control" type="number" id="inputFieldTextMaxLength" placeholder="0" ng-model="field.maxLength">
+    </div>
+  </div>
+</div>
+<div class="row" ng-show="field.type === 'LINK' || field.type === 'LINK_MULTIPLE'">
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label class="control-label">Table du lien</label>
+      <ui-select ng-model="selectedEntity" on-select="onSelectEntityCallback($item, $model)">
+        <ui-select-match placeholder="Choisir une table la liste...">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="item as item in entities track by $index"
+          refresh="refreshEntities($select.search)"
+          refresh-delay="0">
+          <div ng-bind-html="item.name | highlight: $select.search"></div>
+          <small>
+            {{item.comment}}
+          </small>
+        </ui-select-choices>
+      </ui-select>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label class="control-label">Colonne de la table du lien</label>
+      <ui-select ng-model="selectedField" on-select="onSelectFieldCallback($item, $model)">
+        <ui-select-match placeholder="Choisir une colonne la liste...">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="field in selectedEntity.fields | filter: {name: $select.search}">
+          <div ng-bind-html="field.name | highlight: $select.search"></div>
+        </ui-select-choices>
+      </ui-select>
     </div>
   </div>
 

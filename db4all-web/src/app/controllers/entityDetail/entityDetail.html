@@ -112,7 +112,12 @@
                             <tbody>
                               <tr>
                                 <td colspan="3">
-                                  <field-editor field="entityDetail.newField">
+                                  <field-editor field="entityDetail.newField"
+                                                can-change-type="true"
+                                                entities="entityDetail.allEntities"
+                                                refresh-entities="entityDetail.refreshEntities"
+                                                selected-entity="entityDetail.newLinkEntity"
+                                                selected-field="entityDetail.newLinkField">
                                     <a id="addNewField" type="button" class="btn btn-success" ng-click="entityDetail.addNewField()">
                                       <span class="glyphicon glyphicon-plus"></span> Ajouter
                                     </a>
@@ -121,7 +126,12 @@
                               </tr>
                               <tr ng-repeat="field in entityDetail.entity.fields track by $index">
                                 <td colspan="3" ng-show="entityDetail.currentFieldIndex === $index">
-                                  <field-editor field="entityDetail.currentField">
+                                  <field-editor field="entityDetail.currentField"
+                                                can-change-type="false"
+                                                entities="entityDetail.allEntities"
+                                                refresh-entities="entityDetail.refreshEntities"
+                                                selected-entity="entityDetail.currentLinkEntity"
+                                                selected-field="entityDetail.currentLinkField">
                                     <a id="saveField" type="button" class="btn btn-primary" ng-click="entityDetail.saveField()">
                                       OK
                                     </a>

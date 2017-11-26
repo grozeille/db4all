@@ -1,3 +1,4 @@
+var jquery = require('jquery');
 var angular = require('angular');
 
 var datalakeToolboxModule = require('./app');

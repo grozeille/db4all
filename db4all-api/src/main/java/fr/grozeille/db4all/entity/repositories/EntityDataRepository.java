@@ -107,21 +107,17 @@ public class EntityDataRepository {
                         }
                     }
                     else if(fieldType == EntityFieldType.LINK || fieldType == EntityFieldType.LINK_MULTIPLE) {
-                        if(entry.getValue().getClass().equals(String[].class)) {
-                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString((String[])entry.getValue()));
-                        }
-                        else if(entry.getValue() instanceof Iterable) {
-                            String[] array = Iterables.toArray((Iterable)entry.getValue(), String.class);
-                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(array));
+                        if(entry.getValue() instanceof Iterable) {
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(entry.getValue()));
                         }
                         else if(entry.getValue() == null) {
-                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new String[0]));
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new Map[0]));
                         }
                         else {
                             try {
                                 columnValue = Bytes.toBytes(entry.getValue().toString());
                             }catch(Exception ex) {
-                                columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new String[0]));
+                                columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new Map[0]));
                                 log.error("Unable to parse column "+columnId+" as array");
                             }
                         }
@@ -234,9 +230,9 @@ public class EntityDataRepository {
                     }
                     else if(fieldType == EntityFieldType.LINK || fieldType == EntityFieldType.LINK_MULTIPLE) {
                         try {
-                            columnValue = objectMapper.readValue(Bytes.toString(valueBytes), String[].class);
+                            columnValue = objectMapper.readValue(Bytes.toString(valueBytes), Map[].class);
                         }catch(Exception ex) {
-                            columnValue = new String[0];
+                            columnValue = new Map[0];
                             log.error("Unable to parse column "+columnId+" as array");
                         }
                     }

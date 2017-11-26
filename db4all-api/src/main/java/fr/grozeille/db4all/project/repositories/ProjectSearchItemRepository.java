@@ -10,6 +10,6 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 @NoRepositoryBean
 public interface ProjectSearchItemRepository extends SolrCrudRepository<ProjectSearchItem, String> {
 
-    @Query(value = "text:'?0'")
+    @Query(value = "text:*?0*")
     Page<ProjectSearchItem> findAll(Pageable pageable, String filter);
 }
