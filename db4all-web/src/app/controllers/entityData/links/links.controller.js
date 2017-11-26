@@ -174,6 +174,18 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
     $uibModalInstance.dismiss();
   };
 
+  vm.selectAll = function() {
+    for(var cptData in vm.filteredData) {
+      vm.filteredData[cptData]['##selection##'] = true;
+    }
+  };
+
+  vm.unselectAll = function() {
+    for(var cptData in vm.filteredData) {
+      vm.filteredData[cptData]['##selection##'] = false;
+    }
+  };
+
   activate();
 
   function activate() {
