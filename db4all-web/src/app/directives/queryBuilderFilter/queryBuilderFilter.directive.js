@@ -38,6 +38,10 @@ function queryBuilderFilter($compile, $log) {
             str += ' <strong>' + group.operator + '</strong> ';
           }
 
+          if(group.rules[i].field === null) {
+            continue;
+          }
+
           if(group.rules[i].group) {
             str += computed(group.rules[i].group);
           } else {

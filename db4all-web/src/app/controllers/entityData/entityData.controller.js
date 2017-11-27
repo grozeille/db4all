@@ -42,7 +42,6 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
   vm.currentColumn = '';
 
   vm.queryGroup = {operator: 'ET', rules: []};
-  vm.filterOpen = false;
 
   vm.refresh = function() {
     entityService.getById(vm.projectId, vm.entityId)
