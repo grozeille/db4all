@@ -1,0 +1,23 @@
+<uib-accordion>
+    <div uib-accordion-group class="panel-default" is-open="filterOpen">
+        <uib-accordion-heading>
+            Filtre:  <span ng-bind-html="computedGroup()"></span> <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': filterOpen, 'glyphicon-chevron-right': !filterOpen}"></i>
+        </uib-accordion-heading>
+        <div class="row">
+            <div class="col-sm-12">
+                <query-builder group="queryGroup" fields="fields"></query-builder>
+            </div>
+        </div>
+        <div class="row" style="margin-top:20px;">
+            <div class="col-sm-12">
+                <a type="button" class="btn btn-default" ng-click="filter()">
+                    Filtrer
+                </a>
+                <a type="button" class="btn btn-default" ng-click="cancelFilter()">
+                    Annuler le filtrer
+                </a>
+            </div>
+        </div>
+
+    </div>
+</uib-accordion>

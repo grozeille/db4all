@@ -107,7 +107,7 @@ function queryBuilder($window, $log, $compile) {
       fields: '=',
       removeVisible: '@'
     },
-    template: require('./queryBuilderDirective.html'),
+    template: require('./queryBuilder.html'),
     compile: compile
   };
 
