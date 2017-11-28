@@ -14,6 +14,32 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
     </properties>
 
+    <scm>
+        <connection>scm:git:https://github.com/grozeille/db4all.git</connection>
+    </scm>
+
+    <issueManagement>
+        <url>https://github.com/grozeille/db4all/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License v2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <email>mathias.kluba@gmail.com</email>
+            <name>Mathias Kluba</name>
+            <url>https://github.com/grozeille</url>
+            <id>grozeille</id>
+        </developer>
+    </developers>
+
     <modules>
         <module>db4all-web</module>
         <module>db4all-api</module>
