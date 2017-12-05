@@ -5,4 +5,8 @@
     <name>hbase.cluster.distributed</name>
     <value>true</value>
   </property>
+  <property>
+    <name>hbase.regionserver.ipc.address</name>
+    <value>0.0.0.0</value>
+  </property>
 </configuration>
