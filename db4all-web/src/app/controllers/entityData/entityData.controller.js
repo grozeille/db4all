@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function EntityDataController($scope, $log, $uibModal, $stateParams, $document, entityService, hotRegisterer, hotkeys) {
+function EntityDataController($scope, $log, $uibModal, $stateParams, $document, entityService, projectService, hotRegisterer, hotkeys) {
   var vm = this;
 
   vm.alerts = [];
@@ -23,6 +23,9 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     comment: '',
     tags: [],
     fields: []
+  };
+  vm.project = {
+    name: ''
   };
   vm.fields = {};
   vm.filteredData = [];
@@ -44,6 +47,14 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
   vm.queryGroup = {operator: 'ET', rules: []};
 
   vm.refresh = function() {
+    projectService.getById(vm.projectId)
+      .then(function(data) {
+        vm.project = data;
+      })
+      .catch(function(error) {
+        vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
+        throw error;
+      });
     entityService.getById(vm.projectId, vm.entityId)
       .then(function(entity) {
         vm.entity = entity;

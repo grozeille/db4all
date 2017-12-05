@@ -17,6 +17,15 @@
 
 <div class="container-fluid page-container" style="padding-top:20px;">
 
+  <div class="row">
+    <div class="col-md-12">
+      <ol class="breadcrumb">
+        <li><a ui-sref="project"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+        <li class="active"><a>{{entity.project.name}}</a></li>
+      </ol>
+    </div>
+  </div>
+
   <div class="row" style="margin-bottom:20px;">
     <form ng-submit="entity.loadAllEntities()">
       <div class="col-md-12">

@@ -7,11 +7,13 @@ module.exports = {
 };
 
 /** @ngInject */
-function EntityController($timeout, $log, $location, $filter, $uibModal, $state, $stateParams, entityService) {
+function EntityController($timeout, $log, $location, $filter, $uibModal, $state, $stateParams, entityService, projectService) {
   var vm = this;
 
   vm.projectId = $stateParams.projectId;
-
+  vm.project = {
+    name: ''
+  };
   vm.sourceFilter = '';
   vm.entityList = [];
   vm.pageResult = {
@@ -94,6 +96,15 @@ function EntityController($timeout, $log, $location, $filter, $uibModal, $state,
   };
 
   function activate() {
+    projectService.getById(vm.projectId)
+      .then(function(data) {
+        vm.project = data;
+      })
+      .catch(function(error) {
+        vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
+        throw error;
+      });
+
     vm.loadAllEntities();
   }
 

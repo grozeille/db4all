@@ -7,7 +7,7 @@ module.exports = {
 };
 
 /** @ngInject */
-function EntityDetailController($log, $uibModal, $stateParams, entityService) {
+function EntityDetailController($log, $uibModal, $stateParams, entityService, projectService) {
   var vm = this;
 
   vm.saving = false;
@@ -23,6 +23,9 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
     fields: []
   };
   vm.tags = [];
+  vm.project = {
+    name: ''
+  };
 
   vm.currentField = null;
   vm.currentLinkEntity = null;
@@ -78,6 +81,15 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService) {
   };
 
   vm.refresh = function() {
+    projectService.getById(vm.projectId)
+      .then(function(data) {
+        vm.project = data;
+      })
+      .catch(function(error) {
+        vm.alerts.push({msg: 'Unable to get project ' + vm.projectId + '.', type: 'danger'});
+        throw error;
+      });
+
     if(vm.entityId !== '') {
       entityService.getById(vm.projectId, vm.entityId)
         .then(function(data) {
