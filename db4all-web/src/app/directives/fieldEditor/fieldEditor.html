@@ -70,6 +70,15 @@
       </ui-select>
     </div>
   </div>
+  <div class="col-sm-4" ng-show="field.type === 'LINK'">
+    <div class="form-group">
+      <label class="control-label">Type d'éditeur</label>
+      <select class="form-control" ng-model="field.linkType">
+        <option value="DROPDOWN">Menu</option>
+        <option value="TABLE">Table</option>
+      </select>
+    </div>
+  </div>
 
 </div>
 <div class="row">

@@ -3,6 +3,31 @@
     position: absolute;
 }
 
+.linkSimpleEditor {
+  /* padding: 5px 7px; */
+  display: block;
+  position: absolute;
+}
+
+.linkSimpleEditor > li > a:hover {
+  color: #fff;
+  text-decoration: none;
+  background-color: #337ab7
+}
+
+.linkSimpleEditor > li > a.selected {
+  font-weight: bold;
+}
+
+.htSelectEditor {
+  padding: 5px 7px;
+  position: absolute;
+  /*
+   * This hack enables to change <select> dimensions in WebKit browsers
+   */
+  -webkit-appearance: menulist-button !important;
+}
+
 #modal-link {
 
 }

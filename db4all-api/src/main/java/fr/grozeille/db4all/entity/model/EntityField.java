@@ -23,4 +23,6 @@ public class EntityField {
     private int entityField;
 
     private int maxLength;
+
+    private EntityLinkType linkType;
 }

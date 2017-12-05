@@ -97,8 +97,18 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
             column.renderer = 'checkbox';
           }
           else if(field.type === 'LINK') {
-            column.editor = vm.linkEditor;
-            column.renderer = vm.linkRenderer;
+            if(field.linkType === 'DROPDOWN') {
+              column.editor = vm.linkSimpleEditor;
+              column.selectOptions = {
+                1: 'Ceci est un test',
+                2: 'Ceci est un test 2'
+              };
+              column.renderer = vm.linkRenderer;
+            }
+            else {
+              column.editor = vm.linkEditor;
+              column.renderer = vm.linkRenderer;
+            }
           }
           else if(field.type === 'LINK_MULTIPLE') {
             column.editor = vm.linkEditor;
@@ -253,6 +263,115 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     };
 
     vm.linkEditor.prototype.focus = function() {
+    };
+
+    vm.linkSimpleEditor = Handsontable.editors.BaseEditor.prototype.extend();
+
+    vm.linkSimpleEditor.prototype.init = function() {
+      // Create detached node, add CSS class and make sure its not visible
+      this.select = $document[0].createElement('ul');
+      // Handsontable.dom.addClass(this.select, 'htSelectEditor');
+      Handsontable.dom.addClass(this.select, 'linkSimpleEditor');
+      Handsontable.dom.addClass(this.select, 'dropdown-menu');
+      this.select.style.display = 'none';
+
+      // Attach node to DOM, by appending it to the container holding the table
+      this.instance.rootElement.appendChild(this.select);
+    };
+
+    // Create options in prepare() method
+    vm.linkSimpleEditor.prototype.prepare = function() {
+      // Remember to invoke parent's method
+      Handsontable.editors.BaseEditor.prototype.prepare.apply(this, arguments);
+
+      var selectOptions = this.cellProperties.selectOptions;
+      var options;
+
+      if (angular.isFunction(selectOptions)) {
+        options = this.prepareOptions(selectOptions(this.row, this.col, this.prop));
+      } else {
+        options = this.prepareOptions(selectOptions);
+      }
+      Handsontable.dom.empty(this.select);
+
+      var editor = this;
+      var onclick = function(e) {
+        e.preventDefault();
+        // editor.select.value = this.value;
+        editor.select.value = [{id: this.value, display: this.innerHTML}];
+        editor.instance.destroyEditor(false);
+      };
+
+      for (var option in options) {
+        var optionElement = $document[0].createElement('li');
+        var hrefElement = $document[0].createElement('a');
+        optionElement.appendChild(hrefElement);
+        hrefElement.href = '#';
+        hrefElement.value = option;
+        hrefElement.onclick = onclick;
+        Handsontable.dom.fastInnerHTML(hrefElement, options[option]);
+        this.select.appendChild(optionElement);
+      }
+    };
+
+    vm.linkSimpleEditor.prototype.prepareOptions = function(optionsToPrepare) {
+      var preparedOptions = {};
+
+      if (angular.isArray(optionsToPrepare)) {
+        for(var i = 0, len = optionsToPrepare.length; i < len; i++) {
+          preparedOptions[optionsToPrepare[i]] = optionsToPrepare[i];
+        }
+      } else if (angular.isObject(optionsToPrepare)) {
+        preparedOptions = optionsToPrepare;
+      }
+
+      return preparedOptions;
+    };
+
+    vm.linkSimpleEditor.prototype.getValue = function() {
+      vm.filteredData[this.row][this.prop] = this.select.value;
+      return vm.filteredData[this.row][this.prop];
+    };
+
+    vm.linkSimpleEditor.prototype.setValue = function(value) {
+      if(angular.isDefined(vm.filteredData[this.row][this.prop]) && angular.isDefined(vm.filteredData[this.row][this.prop][0]) && angular.isDefined(vm.filteredData[this.row][this.prop][0].id)) {
+        this.select.value = vm.filteredData[this.row][this.prop];
+        for(var cptNode = 0; cptNode < this.select.childNodes.length; cptNode++) {
+          var li = this.select.childNodes[cptNode];
+          if(li.childNodes[0].value === this.select.value[0].id) {
+            Handsontable.dom.addClass(li.childNodes[0], 'selected');
+          }
+          else {
+            Handsontable.dom.removeClass(li.childNodes[0], 'selected');
+          }
+        }
+      }
+    };
+
+    vm.linkSimpleEditor.prototype.open = function() {
+      var width = Handsontable.dom.outerWidth(this.TD);
+      var height = Handsontable.dom.outerHeight(this.TD);
+      var rootOffset = Handsontable.dom.offset(this.instance.rootElement);
+      var tdOffset = Handsontable.dom.offset(this.TD);
+
+      // sets select dimensions to match cell size
+      // this.select.style.height = height + 'px';
+      // this.select.style.minWidth = width + 'px';
+
+      // make sure that list positions matches cell position
+      this.select.style.top = tdOffset.top - rootOffset.top + height + 'px';
+      this.select.style.left = tdOffset.left - rootOffset.left + 'px';
+      this.select.style.margin = '0px';
+
+      // display the list
+      this.select.style.display = '';
+    };
+
+    vm.linkSimpleEditor.prototype.close = function() {
+      this.select.style.display = 'none';
+    };
+
+    vm.linkSimpleEditor.prototype.focus = function() {
     };
 
     vm.maxLengthTextRenderer = function(instance, td, row, col, prop, value, cellProperties) {
