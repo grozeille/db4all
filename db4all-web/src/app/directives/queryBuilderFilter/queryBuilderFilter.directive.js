@@ -129,10 +129,10 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
       return !String(value).toUpperCase().endsWith(rule.data.toUpperCase());
     }
     else if(condition === 'CONTIENT') {
-      return String(value.toUpperCase()).indexOf(rule.data.toUpperCase()) !== -1;
+      return String(value).toUpperCase().indexOf(rule.data.toUpperCase()) !== -1;
     }
     else if(condition === 'NE CONTIENT PAS') {
-      return String(value.toUpperCase()).indexOf(rule.data.toUpperCase()) === -1;
+      return String(value).toUpperCase().indexOf(rule.data.toUpperCase()) === -1;
     }
     else if(condition === 'DANS') {
       var inTestValues = rule.data.split(',');
