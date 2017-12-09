@@ -48,6 +48,7 @@ angular
     'ngHandsontable',
     'cfp.hotkeys']);
 
+require('./filters');
 require('./directives');
 require('./services');
 require('./controllers');

@@ -22,7 +22,9 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     name: '',
     comment: '',
     tags: [],
-    fields: []
+    fields: [],
+    filters: [],
+    lastFilter: {operator: 'ET', rules: []}
   };
   vm.project = {
     name: ''
@@ -44,8 +46,6 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
   vm.linkEditor = {};
   vm.currentColumn = '';
 
-  vm.queryGroup = {operator: 'ET', rules: []};
-
   vm.refresh = function() {
     projectService.getById(vm.projectId)
       .then(function(data) {
@@ -60,6 +60,12 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
         vm.entity = entity;
         if(angular.isUndefined(vm.entity.fields) || vm.entity.fields === null) {
           vm.entity.fields = [];
+        }
+        if(angular.isUndefined(vm.entity.lastFilter) || vm.entity.lastFilter === null) {
+          vm.entity.lastFilter = {operator: 'ET', rules: []};
+        }
+        if(angular.isUndefined(vm.entity.filters) || vm.entity.filters === null) {
+          vm.entity.filters = [];
         }
 
         vm.colWidths = [];
@@ -209,6 +215,65 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
       vm.currentColumn = this.getDataAtCell(row, column);
     }
     $scope.$apply();
+  };
+
+  vm.onSaveFilter = function(newFilter) {
+    var found = false;
+    for(var filterCpt in vm.entity.filters) {
+      var filter = vm.entity.filters[filterCpt];
+      if(filter.name.toLowerCase() === newFilter.name.toLowerCase()) {
+        filter.filter = newFilter.filter;
+        found = true;
+        break;
+      }
+    }
+
+    if(!found) {
+      vm.entity.filters.push(newFilter);
+    }
+
+    vm.saving = true;
+
+    // save the entity settings to keep the column width, then save the data
+    entityService.save(vm.projectId, vm.entity)
+    .then(function(request) {
+      vm.alerts.push({msg: 'Filtre sauvegardé.', type: 'info'});
+      vm.saving = false;
+    })
+    .catch(function(error) {
+      vm.saving = false;
+      vm.alerts.push({msg: 'Erreur pendant la sauvegarde du filtre.', type: 'danger'});
+      throw error;
+    });
+  };
+
+  vm.onDeleteFilter = function(filterName) {
+    var index = -1;
+    for(var filterCpt in vm.entity.filters) {
+      var filter = vm.entity.filters[filterCpt];
+      if(filter.name.toLowerCase() === filterName.toLowerCase()) {
+        index = filterCpt;
+        break;
+      }
+    }
+
+    if(index > -1) {
+      vm.entity.filters.splice(index, 1);
+    }
+
+    vm.saving = true;
+
+    // save the entity settings to keep the column width, then save the data
+    entityService.save(vm.projectId, vm.entity)
+    .then(function(request) {
+      vm.alerts.push({msg: 'Filtre supprimé.', type: 'info'});
+      vm.saving = false;
+    })
+    .catch(function(error) {
+      vm.saving = false;
+      vm.alerts.push({msg: 'Erreur pendant la suppression du filtre.', type: 'danger'});
+      throw error;
+    });
   };
 
   function activate() {

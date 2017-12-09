@@ -1,21 +1,53 @@
+<script type="text/ng-template" id="delete.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Supprimer le filtre ?</h3>
+    </div>
+    <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer le filtre '{{delete.name}}' ?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="delete.ok()">OK</button>
+        <button class="btn btn-default" type="button" ng-click="delete.cancel()">Cancel</button>
+    </div>
+</script>
+
 <uib-accordion>
-    <div uib-accordion-group class="panel-default" is-open="filterOpen">
+    <div uib-accordion-group class="panel-default" is-open="ctrl.filterOpen">
         <uib-accordion-heading>
-            Filtre:  <span ng-bind-html="computedGroup()"></span> <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': filterOpen, 'glyphicon-chevron-right': !filterOpen}"></i>
+            Filtre:  <span ng-bind-html="ctrl.computedGroup()"></span> <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ctrl.filterOpen, 'glyphicon-chevron-right': !ctrl.filterOpen}"></i>
         </uib-accordion-heading>
         <div class="row">
             <div class="col-sm-12">
-                <query-builder group="queryGroup" fields="fields"></query-builder>
+                <query-builder group="ctrl.currentFilter" fields="ctrl.fields"></query-builder>
             </div>
         </div>
         <div class="row" style="margin-top:20px;">
-            <div class="col-sm-12">
-                <a type="button" class="btn btn-default" ng-click="filter()">
+            <div class="col-sm-4">
+                <a type="button" class="btn btn-default" ng-click="ctrl.filter()">
                     Filtrer
                 </a>
-                <a type="button" class="btn btn-default" ng-click="cancelFilter()">
+                <a type="button" class="btn btn-default" ng-click="ctrl.cancelFilter()">
                     Annuler le filtrer
                 </a>
+            </div>
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.delete()" ng-disabled="!ctrl.canDelete()">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+                <a type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.save()">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                </a>
+                <a type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.load()">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </a>
+                <div id="filter-select" class="pull-right margin-left">
+                    <ui-select ng-model="ctrl.selectedFilter" on-select="ctrl.onSelectFilter($item, $model)">
+                        <ui-select-match placeholder="Nom du filtre...">{{$select.selected.name}}</ui-select-match>
+                        <ui-select-choices repeat="f in ctrl.allFilters | filterFilter: {name: $select.search}">
+                            <div ng-bind-html="f.name | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
             </div>
         </div>
 

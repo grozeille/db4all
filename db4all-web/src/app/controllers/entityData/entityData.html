@@ -32,7 +32,15 @@
 
   <div class="row fill-height-substract">
     <div class="col-sm-12">
-      <query-builder-filter data="entityData.data" filtered-data="entityData.filteredData" group="entityData.queryGroup" fields="entityData.entity.fields">
+      <query-builder-filter
+              data="entityData.data"
+              filtered-data="entityData.filteredData"
+              current-filter="entityData.entity.lastFilter"
+              all-filters="entityData.entity.filters"
+              fields="entityData.entity.fields"
+              on-save="entityData.onSaveFilter"
+              on-delete="entityData.onDeleteFilter"
+              apply-filter="true">
 
       </query-builder-filter>
     </div>

@@ -18,4 +18,8 @@ public class Entity {
     private String[] tags;
 
     private EntityField[] fields;
+
+    private EntityFilter[] filters;
+
+    private EntityFilterGroup lastFilter;
 }
