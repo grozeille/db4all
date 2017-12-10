@@ -224,6 +224,7 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
   vm.load = function() {
     if(angular.isDefined(vm.selectedFilter.filter)) {
       vm.currentFilter = angular.copy(vm.selectedFilter.filter);
+      vm.filter();
     }
   };
 
