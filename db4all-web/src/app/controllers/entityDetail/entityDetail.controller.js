@@ -7,7 +7,7 @@ module.exports = {
 };
 
 /** @ngInject */
-function EntityDetailController($log, $uibModal, $stateParams, entityService, projectService) {
+function EntityDetailController($log, $uibModal, $state, $stateParams, entityService, projectService) {
   var vm = this;
 
   vm.saving = false;
@@ -219,6 +219,10 @@ function EntityDetailController($log, $uibModal, $stateParams, entityService, pr
     var field = vm.entity.fields[index];
     vm.removeField(index);
     vm.entity.fields.splice(index + 1, 0, field);
+  };
+
+  vm.viewEntity = function() {
+    $state.go('entityData', {projectId: vm.projectId, id: vm.entityId});
   };
 
   function activate() {

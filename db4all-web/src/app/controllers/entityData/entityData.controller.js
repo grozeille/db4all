@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function EntityDataController($scope, $log, $uibModal, $stateParams, $document, entityService, projectService, hotRegisterer, hotkeys) {
+function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $document, entityService, projectService, hotRegisterer, hotkeys) {
   var vm = this;
 
   vm.alerts = [];
@@ -458,6 +458,10 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
       vm.alerts.push({msg: 'Erreur pendant la suppression du filtre.', type: 'danger'});
       throw error;
     });
+  };
+
+  vm.editEntity = function() {
+    $state.go('entityDetail', {projectId: vm.projectId, id: vm.entityId});
   };
 
   function activate() {
