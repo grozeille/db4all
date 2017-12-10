@@ -40,7 +40,21 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     columnSorting: true,
     allowInvalid: false,
     autoColumnSize: false,
-    contextMenu: ['row_above', 'row_below', 'remove_row']
+    contextMenu: ['row_above', 'row_below', 'remove_row'],
+    // onAfterSelection: vm.onAfterSelection,
+    onAfterChange: function(event, type) {
+      if(event !== null) {
+        var row = event[0];
+        var col = event[1];
+        var previousValue = event[2];
+        var newValue = event[3];
+        $scope.$apply();
+      }
+      $log.info('onAfterChange call => event:' + event + ', type: ' + type);
+    },
+    onAfterCreateRow: function(index, amount) {
+      $log.info('onAfterCreateRow call => index:' + index + ', amount: ' + amount);
+    }
   };
 
   vm.linkEditor = {};

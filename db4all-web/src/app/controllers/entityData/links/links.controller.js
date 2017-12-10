@@ -41,7 +41,6 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
   vm.currentFilter = {operator: 'ET', rules: []};
 
   vm.refresh = function() {
-
     var linkSelected = {};
     for(var linkCpt in vm.links) {
       var linkValue = vm.links[linkCpt];
