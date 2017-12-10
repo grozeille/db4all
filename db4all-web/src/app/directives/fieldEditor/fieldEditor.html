@@ -10,7 +10,7 @@
     <div class="form-group">
       <label for="inputFieldName" class="control-label">Type du champ</label>
       <div ng-show="canChangeType">
-      <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="field.type">
+      <select class="form-control" id="inputFieldType" style="font-family: FontAwesome, sans-serif;" ng-model="field.type" ng-change="update()">
         <option value="TEXT">Text</option>
         <option value="NUMERIC">Numérique</option>
         <option value="BOOL">Vrai/Faux</option>

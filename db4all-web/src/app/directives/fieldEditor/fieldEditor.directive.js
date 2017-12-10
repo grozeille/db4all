@@ -25,7 +25,7 @@ function fieldEditor($compile, $log) {
         scope.selectedEntity = model;
         if(scope.selectedEntity.fields.length > 0) {
           scope.selectedField = scope.selectedEntity.fields[0];
-          scope.field.entityField = scope.selectedField.id;
+          scope.field.entityField = scope.selectedField.fieldId;
         }
         else {
           scope.selectedField = null;
@@ -55,6 +55,14 @@ function fieldEditor($compile, $log) {
         }
         else if(fieldType === 'LINK_MULTIPLE') {
           return 'Lien Table Multiple';
+        }
+      };
+
+      scope.update = function() {
+        if(scope.field.type === 'LINK') {
+          if(angular.isUndefined(scope.field.linkType) || scope.field.linkType === null) {
+            scope.field.linkType = 'DROPDOWN';
+          }
         }
       };
 
