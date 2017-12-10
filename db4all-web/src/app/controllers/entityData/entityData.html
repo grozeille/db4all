@@ -44,9 +44,15 @@
               can-save="true"
               on-save="entityData.onSaveFilter"
               on-delete="entityData.onDeleteFilter"
-              apply-filter="true">
+              apply-filter="entityData.applyFilter">
 
       </query-builder-filter>
+    </div>
+  </div>
+
+  <div class="row fill-height-substract" ng-show="entityData.applyFilter">
+    <div class="col-sm-12">
+      <div class="alert alert-info" role="alert">Table filtrée</div>
     </div>
   </div>
 

@@ -15,7 +15,7 @@ module.exports = function() {
       allFilters: '=',
       onSave: '=',
       onDelete: '=',
-      applyFilter: '@',
+      applyFilter: '=',
       canSave: '@'
     }
   };
@@ -198,7 +198,7 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
   }
 
   vm.filter = function() {
-    $log.info(vm.computedGroup());
+    $log.info('Filter: ' + vm.computedGroup());
 
     var inputArray = vm.data;
     var filteredArray = [];
@@ -215,10 +215,12 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
     }
 
     vm.filteredData = filteredArray;
+    vm.applyFilter = true;
   };
 
   vm.cancelFilter = function() {
     vm.filteredData = vm.data;
+    vm.applyFilter = false;
   };
 
   vm.load = function() {
@@ -276,6 +278,7 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
   };
 
   vm.refresh = function() {
+    $log.info('Refresh filter');
     if(vm.applyFilter) {
       vm.filter();
     }
@@ -292,9 +295,15 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
     return canDeleteFilter;
   };
 
-  $scope.$watch(vm.applyFilter, vm.refresh);
+  $scope.$watch(function() {
+    return vm.applyFilter;
+  }, vm.refresh);
 
-  $scope.$watch(vm.data, vm.refresh, true);
+  $scope.$watch(function() {
+    return vm.data;
+  }, vm.refresh, true);
 
-  $scope.$watch(vm.currentFilter, vm.refresh);
+  $scope.$watch(function() {
+    return vm.currentFilter;
+  }, vm.refresh);
 }

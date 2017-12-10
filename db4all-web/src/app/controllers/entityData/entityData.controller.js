@@ -59,6 +59,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
 
   vm.linkEditor = {};
   vm.currentColumn = '';
+  vm.applyFilter = false;
 
   vm.refresh = function() {
     projectService.getById(vm.projectId)
