@@ -127,33 +127,9 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
       });
   };
 
-  vm.linkRenderer = function(hotInstance, td, row, column, prop, value, cellProperties) {
-    // Optionally include `BaseRenderer` which is responsible for adding/removing CSS classes to/from the table cells.
-    Handsontable.renderers.BaseRenderer.apply(this, arguments);
+  vm.linkRenderer = require('../renderer/linkRenderer.js').renderer;
 
-    if(angular.isDefined(value) && value !== null && value instanceof Array) {
-      var linkValue = [];
-      for(var linkCpt in value) {
-        linkValue.push(value[linkCpt].display);
-      }
-      td.innerHTML = linkValue.join(', ');
-    }
-
-    return td;
-  };
-
-  vm.maxLengthTextRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    var escaped = Handsontable.helper.stringify(value);
-    var maxLength = instance.getCellMeta(row, col).maxLength;
-
-    if(maxLength > 0 && escaped.length > maxLength) {
-      escaped = escaped.substring(0, maxLength) + '...';
-    }
-
-    td.innerHTML = escaped;
-
-    return td;
-  };
+  vm.maxLengthTextRenderer = require('../renderer/maxLengthTextRenderer.js').renderer;
 
   vm.ok = function() {
     $log.info('Modal OK at: ' + new Date());

@@ -84,6 +84,16 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
         vm.colWidths = [];
         vm.columns = [];
+
+        var loadLinkDropDownData = function(column, field) {
+          column.selectOptions = { };
+          entityService.getData(vm.projectId, field.entityId).then(function (data) {
+            for(var cptData in data) {
+              column.selectOptions[cptData] = data[cptData][field.entityField];
+            }
+          });
+        };
+
         for(var cptField in vm.entity.fields) {
           var field = vm.entity.fields[cptField];
 
@@ -130,11 +140,8 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
           else if(field.type === 'LINK') {
             if(field.linkType === 'DROPDOWN') {
               column.editor = vm.linkSimpleEditor;
-              column.selectOptions = {
-                1: 'Ceci est un test',
-                2: 'Ceci est un test 2'
-              };
               column.renderer = vm.linkRenderer;
+              loadLinkDropDownData(column, field);
             }
             else {
               column.editor = vm.linkEditor;
@@ -184,113 +191,7 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
     });
   };
 
-  vm.linkRenderer = function(hotInstance, td, row, column, prop, value, cellProperties) {
-    // Optionally include `BaseRenderer` which is responsible for adding/removing CSS classes to/from the table cells.
-    Handsontable.renderers.BaseRenderer.apply(this, arguments);
-
-    if(angular.isDefined(value) && value !== null && value instanceof Array) {
-      var linkValue = [];
-      for(var linkCpt in value) {
-        linkValue.push(value[linkCpt].display);
-      }
-      td.innerHTML = linkValue.join(', ');
-    }
-
-    return td;
-  };
-
-  vm.onAfterSelection = function(row, column) {
-    var field = vm.fields[this.getCellMeta(row, column).prop];
-    if(field.type === 'BOOL') {
-      if(this.getDataAtCell(row, column)) {
-        vm.currentColumn = 'VRAI';
-      }
-      else {
-        vm.currentColumn = 'FAUX';
-      }
-    }
-    else if(field.type === 'LINK' || field.type === 'LINK_MULTIPLE') {
-      if(this.getDataAtCell(row, column) === null) {
-        vm.currentColumn = '';
-      }
-      else if(this.getDataAtCell(row, column) === '') {
-        vm.currentColumn = '';
-      }
-      else {
-        var linkValue = [];
-        var value = this.getDataAtCell(row, column);
-        for(var linkCpt in value) {
-          linkValue.push(value[linkCpt].display);
-        }
-        vm.currentColumn = linkValue.join(', ');
-      }
-    }
-    else {
-      vm.currentColumn = this.getDataAtCell(row, column);
-    }
-    $scope.$apply();
-  };
-
-  vm.onSaveFilter = function(newFilter) {
-    var found = false;
-    for(var filterCpt in vm.entity.filters) {
-      var filter = vm.entity.filters[filterCpt];
-      if(filter.name.toLowerCase() === newFilter.name.toLowerCase()) {
-        filter.filter = newFilter.filter;
-        found = true;
-        break;
-      }
-    }
-
-    if(!found) {
-      vm.entity.filters.push(newFilter);
-    }
-
-    vm.saving = true;
-
-    // save the entity settings to keep the column width, then save the data
-    entityService.save(vm.projectId, vm.entity)
-    .then(function(request) {
-      vm.alerts.push({msg: 'Filtre sauvegardé.', type: 'info'});
-      vm.saving = false;
-    })
-    .catch(function(error) {
-      vm.saving = false;
-      vm.alerts.push({msg: 'Erreur pendant la sauvegarde du filtre.', type: 'danger'});
-      throw error;
-    });
-  };
-
-  vm.onDeleteFilter = function(filterName) {
-    var index = -1;
-    for(var filterCpt in vm.entity.filters) {
-      var filter = vm.entity.filters[filterCpt];
-      if(filter.name.toLowerCase() === filterName.toLowerCase()) {
-        index = filterCpt;
-        break;
-      }
-    }
-
-    if(index > -1) {
-      vm.entity.filters.splice(index, 1);
-    }
-
-    vm.saving = true;
-
-    // save the entity settings to keep the column width, then save the data
-    entityService.save(vm.projectId, vm.entity)
-    .then(function(request) {
-      vm.alerts.push({msg: 'Filtre supprimé.', type: 'info'});
-      vm.saving = false;
-    })
-    .catch(function(error) {
-      vm.saving = false;
-      vm.alerts.push({msg: 'Erreur pendant la suppression du filtre.', type: 'danger'});
-      throw error;
-    });
-  };
-
-  function activate() {
+  function buildLinkEditor() {
     vm.linkEditor = Handsontable.editors.BaseEditor.prototype.extend();
 
     vm.linkEditor.prototype.init = function () {
@@ -316,9 +217,6 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
       var linkEntityId = field.entityId;
       var originalValue = this.originalValue;
 
-      /* this.linksModal.resolve.entityService = function () {
-        return entityService;
-      }; */
       this.linksModal.resolve.projectId = function () {
         return linkProjectId;
       };
@@ -354,7 +252,9 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
     vm.linkEditor.prototype.focus = function() {
     };
+  }
 
+  function buildSimpleLinkEditor() {
     vm.linkSimpleEditor = Handsontable.editors.BaseEditor.prototype.extend();
 
     vm.linkSimpleEditor.prototype.init = function() {
@@ -463,19 +363,107 @@ function EntityDataController($scope, $log, $uibModal, $stateParams, $document, 
 
     vm.linkSimpleEditor.prototype.focus = function() {
     };
+  }
 
-    vm.maxLengthTextRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-      var escaped = Handsontable.helper.stringify(value);
-      var maxLength = instance.getCellMeta(row, col).maxLength;
+  vm.linkRenderer = require('./renderer/linkRenderer.js').renderer;
 
-      if(maxLength > 0 && escaped.length > maxLength) {
-        escaped = escaped.substring(0, maxLength) + '...';
+  vm.maxLengthTextRenderer = require('./renderer/maxLengthTextRenderer.js').renderer;
+
+  vm.onAfterSelection = function(row, column) {
+    var field = vm.fields[this.getCellMeta(row, column).prop];
+    if(field.type === 'BOOL') {
+      if(this.getDataAtCell(row, column)) {
+        vm.currentColumn = 'VRAI';
       }
+      else {
+        vm.currentColumn = 'FAUX';
+      }
+    }
+    else if(field.type === 'LINK' || field.type === 'LINK_MULTIPLE') {
+      if(this.getDataAtCell(row, column) === null) {
+        vm.currentColumn = '';
+      }
+      else if(this.getDataAtCell(row, column) === '') {
+        vm.currentColumn = '';
+      }
+      else {
+        var linkValue = [];
+        var value = this.getDataAtCell(row, column);
+        for(var linkCpt in value) {
+          linkValue.push(value[linkCpt].display);
+        }
+        vm.currentColumn = linkValue.join(', ');
+      }
+    }
+    else {
+      vm.currentColumn = this.getDataAtCell(row, column);
+    }
+    $scope.$apply();
+  };
 
-      td.innerHTML = escaped;
+  vm.onSaveFilter = function(newFilter) {
+    var found = false;
+    for(var filterCpt in vm.entity.filters) {
+      var filter = vm.entity.filters[filterCpt];
+      if(filter.name.toLowerCase() === newFilter.name.toLowerCase()) {
+        filter.filter = newFilter.filter;
+        found = true;
+        break;
+      }
+    }
 
-      return td;
-    };
+    if(!found) {
+      vm.entity.filters.push(newFilter);
+    }
+
+    vm.saving = true;
+
+    // save the entity settings to keep the column width, then save the data
+    entityService.save(vm.projectId, vm.entity)
+    .then(function(request) {
+      vm.alerts.push({msg: 'Filtre sauvegardé.', type: 'info'});
+      vm.saving = false;
+    })
+    .catch(function(error) {
+      vm.saving = false;
+      vm.alerts.push({msg: 'Erreur pendant la sauvegarde du filtre.', type: 'danger'});
+      throw error;
+    });
+  };
+
+  vm.onDeleteFilter = function(filterName) {
+    var index = -1;
+    for(var filterCpt in vm.entity.filters) {
+      var filter = vm.entity.filters[filterCpt];
+      if(filter.name.toLowerCase() === filterName.toLowerCase()) {
+        index = filterCpt;
+        break;
+      }
+    }
+
+    if(index > -1) {
+      vm.entity.filters.splice(index, 1);
+    }
+
+    vm.saving = true;
+
+    // save the entity settings to keep the column width, then save the data
+    entityService.save(vm.projectId, vm.entity)
+    .then(function(request) {
+      vm.alerts.push({msg: 'Filtre supprimé.', type: 'info'});
+      vm.saving = false;
+    })
+    .catch(function(error) {
+      vm.saving = false;
+      vm.alerts.push({msg: 'Erreur pendant la suppression du filtre.', type: 'danger'});
+      throw error;
+    });
+  };
+
+  function activate() {
+    buildLinkEditor();
+
+    buildSimpleLinkEditor();
 
     hotkeys.bindTo($scope)
     .add({
