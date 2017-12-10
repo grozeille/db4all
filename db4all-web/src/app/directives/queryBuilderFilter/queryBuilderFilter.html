@@ -31,10 +31,10 @@
                 </a>
             </div>
             <div class="col-sm-8">
-                <button type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.delete()" ng-disabled="!ctrl.canDelete()">
+                <button type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.delete()" ng-disabled="!ctrl.canDelete()" ng-show="ctrl.canSave">
                     <span class="glyphicon glyphicon-trash"></span>
                 </button>
-                <a type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.save()">
+                <a type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.save()" ng-show="ctrl.canSave">
                     <span class="glyphicon glyphicon-download-alt"></span>
                 </a>
                 <a type="button" class="btn btn-default pull-right margin-left" ng-click="ctrl.load()">
@@ -43,7 +43,7 @@
                 <div id="filter-select" class="pull-right margin-left">
                     <ui-select ng-model="ctrl.selectedFilter" on-select="ctrl.onSelectFilter($item, $model)">
                         <ui-select-match placeholder="Nom du filtre...">{{$select.selected.name}}</ui-select-match>
-                        <ui-select-choices repeat="f in ctrl.allFilters | filterFilter: {name: $select.search}">
+                        <ui-select-choices repeat="f in ctrl.allFilters | filterFilter: {name: $select.search, allowNew: ctrl.canSave}">
                             <div ng-bind-html="f.name | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>

@@ -15,7 +15,8 @@ module.exports = function() {
       allFilters: '=',
       onSave: '=',
       onDelete: '=',
-      applyFilter: '@'
+      applyFilter: '@',
+      canSave: '@'
     }
   };
 };
@@ -29,6 +30,7 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
   vm.data = [];
   vm.filteredData = [];
   vm.selectedFilter = {};
+  vm.canSave = true;
 
   vm.computedGroup = function() {
     var result = computed(vm.currentFilter);

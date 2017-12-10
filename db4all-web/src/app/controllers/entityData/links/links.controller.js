@@ -38,10 +38,9 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
     columnSorting: true,
     autoColumnSize: false
   };
-  vm.queryGroup = {operator: 'ET', rules: []};
+  vm.currentFilter = {operator: 'ET', rules: []};
 
   vm.refresh = function() {
-    // TODO: select rows for provided vm.links
 
     var linkSelected = {};
     for(var linkCpt in vm.links) {

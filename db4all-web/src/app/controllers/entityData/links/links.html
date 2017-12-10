@@ -1,11 +1,18 @@
 <div class="modal-header" style="margin-bottom:30px;">
-    <h3 class="modal-title">Choisir des éléments</h3>
+    <h3 class="modal-title">Choisir des éléments de la table "{{links.entity.name}}"</h3>
   </div>
   <div class="modal-body">
 
     <div class="row">
       <div class="col-sm-12">
-        <query-builder-filter data="links.data" filtered-data="links.filteredData" group="links.queryGroup" fields="links.entity.fields">
+        <query-builder-filter
+                data="links.data"
+                filtered-data="links.filteredData"
+                current-filter="links.currentFilter"
+                all-filters="links.entity.filters"
+                fields="links.entity.fields"
+                can-save="false"
+                apply-filter="true">
 
         </query-builder-filter>
       </div>
