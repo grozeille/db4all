@@ -72,11 +72,11 @@ public class EntityDataRepository {
 
                     EntityFieldType fieldType = fieldTypes.get(columnId);
                     if(fieldType == EntityFieldType.BOOL) {
-                        if(entry.getValue().getClass().equals(boolean.class)) {
-                            columnValue = Bytes.toBytes((boolean)entry.getValue());
-                        }
-                        else if(entry.getValue() == null) {
+                        if(entry.getValue() == null) {
                             columnValue = Bytes.toBytes(false);
+                        }
+                        else if(entry.getValue().getClass().equals(boolean.class)) {
+                            columnValue = Bytes.toBytes((boolean)entry.getValue());
                         }
                         else {
                             try {
@@ -88,14 +88,14 @@ public class EntityDataRepository {
                         }
                     }
                     else if(fieldType == EntityFieldType.NUMERIC) {
-                        if(entry.getValue().getClass().equals(double.class)) {
+                        if(entry.getValue() == null) {
+                            columnValue = Bytes.toBytes(0.0);
+                        }
+                        else if(entry.getValue().getClass().equals(double.class)) {
                             columnValue = Bytes.toBytes((double)entry.getValue());
                         }
                         else if(entry.getValue().getClass().equals(int.class)) {
                             columnValue = Bytes.toBytes((double)((int)entry.getValue()));
-                        }
-                        else if(entry.getValue() == null) {
-                            columnValue = Bytes.toBytes(0.0);
                         }
                         else {
                             try {
@@ -107,11 +107,11 @@ public class EntityDataRepository {
                         }
                     }
                     else if(fieldType == EntityFieldType.LINK || fieldType == EntityFieldType.LINK_MULTIPLE) {
-                        if(entry.getValue() instanceof Iterable) {
-                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(entry.getValue()));
-                        }
-                        else if(entry.getValue() == null) {
+                        if(entry.getValue() == null) {
                             columnValue = Bytes.toBytes(objectMapper.writeValueAsString(new Map[0]));
+                        }
+                        else if(entry.getValue() instanceof Iterable) {
+                            columnValue = Bytes.toBytes(objectMapper.writeValueAsString(entry.getValue()));
                         }
                         else {
                             try {
