@@ -31,7 +31,7 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
   vm.columns = [];
   vm.colWidths = [];
   vm.settings = {
-    height: 500,
+    height: 300,
     readOnly: true,
     manualColumnResize: true,
     manualRowResize: false,
