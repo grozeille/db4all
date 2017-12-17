@@ -367,6 +367,10 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
 
   vm.onAfterChange = function(core, events, type) {
     if(events !== null) {
+      if(events instanceof Array && !(events[0] instanceof Array)) {
+        events = [events];
+      }
+
       for(var eventCpt in events) {
         var event = events[eventCpt];
         var row = event[0];

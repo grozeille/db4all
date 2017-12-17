@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function LinksController($timeout, $log, $location, $filter, $uibModalInstance, entityService, projectId, entityId, sourceField, links) {
+function LinksController($timeout, $log, $location, $scope, $filter, $uibModalInstance, entityService, projectId, entityId, sourceField, links) {
   var vm = this;
 
   vm.alerts = [];
@@ -36,9 +36,36 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
     manualColumnResize: true,
     manualRowResize: false,
     columnSorting: true,
-    autoColumnSize: false
+    autoColumnSize: false,
+    onAfterChange: function(event, type) {
+      vm.onAfterChange(this, event, type);
+    }
   };
   vm.currentFilter = {operator: 'ET', rules: []};
+
+  vm.canSelectAll = function() {
+    return vm.sourceField.type === 'LINK_MULTIPLE';
+  };
+
+  vm.onAfterChange = function(core, events, type) {
+    if(events !== null && vm.sourceField.type === 'LINK') {
+      for(var eventCpt in events) {
+        var event = events[eventCpt];
+        var row = event[0];
+        var col = core.propToCol(event[1]);
+        var previousValue = event[2];
+        var newValue = event[3];
+
+        // set all other rows to false
+        for(var rowCpt in vm.filteredData) {
+          if(rowCpt !== String(row)) {
+            vm.filteredData[rowCpt][event[1]] = false;
+          }
+        }
+      }
+      $scope.$apply();
+    }
+  };
 
   vm.refresh = function() {
     var linkSelected = {};
@@ -125,6 +152,14 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
         vm.alerts.push({msg: 'Unable to get entity ' + vm.entityId + '.', type: 'danger'});
         throw error;
       });
+
+    if(vm.sourceField.type === 'LINK') {
+      $scope.$watch(function() {
+        return vm.filteredData;
+      }, function() {
+
+      }, true);
+    }
   };
 
   vm.linkRenderer = require('../renderer/linkRenderer.js').renderer;
