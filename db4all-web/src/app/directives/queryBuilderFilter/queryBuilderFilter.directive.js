@@ -82,8 +82,8 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
 
   function testRule(row, rule) {
     var condition = rule.condition;
-    var field = rule.field.fieldId;
-    var value = row[field];
+    var fieldId = rule.field.fieldId;
+    var value = row[fieldId];
 
     if(rule.field.type === 'BOOL') {
       if(value === true) {
@@ -94,23 +94,37 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
       }
     }
 
+    if(rule.field.type === 'LINK' || rule.field.type === 'LINK_MULTIPLE') {
+      var result = false;
+      for(var cptValue in value) {
+        var valueItem = value[cptValue];
+        result = result || testRuleItem(condition, rule.data, valueItem.display);
+      }
+      return result;
+    }
+    else {
+      return testRuleItem(condition, rule.data, value);
+    }
+  }
+
+  function testRuleItem(condition, data, value) {
     if(condition === '=') {
-      return String(value).toUpperCase() === rule.data.toUpperCase();
+      return String(value).toUpperCase() === data.toUpperCase();
     }
     else if(condition === '!=') {
-      return String(value).toUpperCase() !== rule.data.toUpperCase();
+      return String(value).toUpperCase() !== data.toUpperCase();
     }
     else if(condition === '<') {
-      return parseFloat(value) < parseFloat(rule.data);
+      return parseFloat(value) < parseFloat(data);
     }
     else if(condition === '<=') {
-      return parseFloat(value) <= parseFloat(rule.data);
+      return parseFloat(value) <= parseFloat(data);
     }
     else if(condition === '>') {
-      return parseFloat(value) > parseFloat(rule.data);
+      return parseFloat(value) > parseFloat(data);
     }
     else if(condition === '>=') {
-      return parseFloat(value) >= parseFloat(rule.data);
+      return parseFloat(value) >= parseFloat(data);
     }
     else if(condition === 'EST NULL') {
       return (angular.isUndefined(value) || value === null || value.length <= 0);
@@ -119,25 +133,25 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
       return !(angular.isUndefined(value) || value === null || value.length <= 0);
     }
     else if(condition === 'COMMENCE PAR') {
-      return String(value).toUpperCase().startsWith(rule.data.toUpperCase());
+      return String(value).toUpperCase().startsWith(data.toUpperCase());
     }
     else if(condition === 'NE COMMENCE PAS PAR') {
-      return !String(value).startsWith(rule.data);
+      return !String(value).startsWith(data);
     }
     else if(condition === 'TERMINE PAR') {
-      return String(value).toUpperCase().endsWith(rule.data.toUpperCase());
+      return String(value).toUpperCase().endsWith(data.toUpperCase());
     }
     else if(condition === 'NE TERMINE PAS PAR') {
-      return !String(value).toUpperCase().endsWith(rule.data.toUpperCase());
+      return !String(value).toUpperCase().endsWith(data.toUpperCase());
     }
     else if(condition === 'CONTIENT') {
-      return String(value).toUpperCase().indexOf(rule.data.toUpperCase()) !== -1;
+      return String(value).toUpperCase().indexOf(data.toUpperCase()) !== -1;
     }
     else if(condition === 'NE CONTIENT PAS') {
-      return String(value).toUpperCase().indexOf(rule.data.toUpperCase()) === -1;
+      return String(value).toUpperCase().indexOf(data.toUpperCase()) === -1;
     }
     else if(condition === 'DANS') {
-      var inTestValues = rule.data.split(',');
+      var inTestValues = data.split(',');
       var inMatch = false;
       for(var inCpt in inTestValues) {
         var inTestValue = inTestValues[inCpt];
@@ -146,7 +160,7 @@ function QueryBuilderFilterController($scope, $log, $uibModal, filterFilter) {
       return inMatch;
     }
     else if(condition === 'N\'EST PAS DANS') {
-      var notIntTestValues = rule.data.split(',');
+      var notIntTestValues = data.split(',');
       var notInMatch = false;
       for(var notInCpt in notIntTestValues) {
         var notInTestValue = notIntTestValues[notInCpt];
