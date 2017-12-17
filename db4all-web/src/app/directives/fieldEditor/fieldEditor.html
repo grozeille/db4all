@@ -64,7 +64,7 @@
       <label class="control-label">Colonne de la table du lien</label>
       <ui-select ng-model="selectedField" on-select="onSelectFieldCallback($item, $model)">
         <ui-select-match placeholder="Choisir une colonne la liste...">{{$select.selected.name}}</ui-select-match>
-        <ui-select-choices repeat="field in selectedEntity.fields | filter: {name: $select.search}">
+        <ui-select-choices repeat="field in selectedEntity.fields | filter:filterLinkFields($select.search)">
           <div ng-bind-html="field.name | highlight: $select.search"></div>
         </ui-select-choices>
       </ui-select>

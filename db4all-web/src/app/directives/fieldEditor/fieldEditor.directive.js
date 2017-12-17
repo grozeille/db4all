@@ -66,6 +66,12 @@ function fieldEditor($compile, $log) {
         }
       };
 
+      scope.filterLinkFields = function(selection) {
+        return function(item) {
+          return item.type !== 'LINK' && item.type !== 'LINK_MULTIPLE' && (selection === '' || item.name.indexOf(selection) !== -1);
+        };
+      };
+
       if(angular.isUndefined(directive)) {
         directive = $compile(content);
       }
