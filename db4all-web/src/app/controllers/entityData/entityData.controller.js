@@ -41,16 +41,11 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     allowInvalid: false,
     autoColumnSize: false,
     contextMenu: ['row_above', 'row_below', 'remove_row'],
-    // onAfterSelection: vm.onAfterSelection,
     onAfterChange: function(event, type) {
-      if(event !== null) {
-        var row = event[0];
-        var col = event[1];
-        var previousValue = event[2];
-        var newValue = event[3];
-        $scope.$apply();
-      }
-      $log.info('onAfterChange call => event:' + event + ', type: ' + type);
+      vm.onAfterChange(this, event, type);
+    },
+    onAfterSelection: function(row, column) {
+      vm.onAfterSelection(this, row, column);
     },
     onAfterCreateRow: function(index, amount) {
       $log.info('onAfterCreateRow call => index:' + index + ', amount: ' + amount);
@@ -370,10 +365,25 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
 
   vm.maxLengthTextRenderer = require('./renderer/maxLengthTextRenderer.js').renderer;
 
-  vm.onAfterSelection = function(row, column) {
-    var field = vm.fields[this.getCellMeta(row, column).prop];
+  vm.onAfterChange = function(core, events, type) {
+    if(events !== null) {
+      for(var eventCpt in events) {
+        var event = events[eventCpt];
+        var row = event[0];
+        var col = core.propToCol(event[1]);
+        var previousValue = event[2];
+        var newValue = event[3];
+
+        vm.onAfterSelection(core, row, col);
+      }
+      $scope.$apply();
+    }
+  };
+
+  vm.onAfterSelection = function(core, row, column) {
+    var field = vm.fields[core.getCellMeta(row, column).prop];
     if(field.type === 'BOOL') {
-      if(this.getDataAtCell(row, column)) {
+      if(core.getDataAtCell(row, column)) {
         vm.currentColumn = 'VRAI';
       }
       else {
@@ -381,15 +391,15 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
       }
     }
     else if(field.type === 'LINK' || field.type === 'LINK_MULTIPLE') {
-      if(this.getDataAtCell(row, column) === null) {
+      if(core.getDataAtCell(row, column) === null) {
         vm.currentColumn = '';
       }
-      else if(this.getDataAtCell(row, column) === '') {
+      else if(core.getDataAtCell(row, column) === '') {
         vm.currentColumn = '';
       }
       else {
         var linkValue = [];
-        var value = this.getDataAtCell(row, column);
+        var value = core.getDataAtCell(row, column);
         for(var linkCpt in value) {
           linkValue.push(value[linkCpt].display);
         }
@@ -397,7 +407,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
       }
     }
     else {
-      vm.currentColumn = this.getDataAtCell(row, column);
+      vm.currentColumn = core.getDataAtCell(row, column);
     }
     $scope.$apply();
   };
