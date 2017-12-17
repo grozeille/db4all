@@ -41,6 +41,7 @@ public class EntityDataRepository {
 
     private final String cfData = "cfData";
 
+    private final String colRowLinkId = "#row_link_id#";
     private final String colDummy = "#dummy#";
     private final byte[] colDummyBytes = Bytes.toBytes(colDummy);
 
@@ -62,10 +63,26 @@ public class EntityDataRepository {
             byte[] cfDataBytes = Bytes.toBytes(cfData);
 
             int rowId = 0;
+            String rowLinkId;
             for(Map<String, Object> map : data.getData()) {
 
                 Put put = new Put(Bytes.toBytes(rowId));
+
+                Object rowIdValue = map.get(colRowLinkId);
+                if(rowIdValue == null) {
+                    rowLinkId = UUID.randomUUID().toString();
+                }
+                else {
+                    rowLinkId = rowIdValue.toString();
+                }
+
+                put.addColumn(cfDataBytes, Bytes.toBytes(colRowLinkId), Bytes.toBytes(rowLinkId));
+
                 for(Map.Entry<String, Object> entry : map.entrySet()) {
+
+                    if(entry.getKey().equals(colRowLinkId)) {
+                        continue;
+                    }
 
                     Integer columnId = Integer.parseInt(entry.getKey());
                     byte[] columnValue;
@@ -241,7 +258,7 @@ public class EntityDataRepository {
                     }
 
 
-                    if(columns.contains(columnId)) {
+                    if(columns.contains(columnId) || columnId.equals(colRowLinkId)) {
                         row.put(columnId, columnValue);
                     }
                 }

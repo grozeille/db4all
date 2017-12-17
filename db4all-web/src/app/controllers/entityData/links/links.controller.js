@@ -113,7 +113,7 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
         return entityService.getData(vm.projectId, vm.entityId).then(function (data) {
           for(var cptData in data) {
             data[cptData]['##selection##'] = false;
-            if(linkSelected[cptData]) {
+            if(linkSelected[data[cptData]['#row_link_id#']]) {
               data[cptData]['##selection##'] = true;
             }
           }
@@ -138,7 +138,7 @@ function LinksController($timeout, $log, $location, $filter, $uibModalInstance, 
     for(var cptData in vm.data) {
       var row = vm.data[cptData];
       if(row['##selection##']) {
-        vm.links.push({id: cptData, display: row[sourceField.entityField]});
+        vm.links.push({id: row['#row_link_id#'], display: row[sourceField.entityField]});
       }
     }
     $uibModalInstance.close(vm.links);
