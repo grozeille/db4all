@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -137,6 +138,22 @@ public class EntityResource {
         }
 
         entityDataRepository.save(project, entity, new EntityData(Arrays.asList(entityData)));
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/{project}/entity/{entity}/version", method = RequestMethod.PUT)
+    public ResponseEntity<Void> updateVersion(
+            @PathVariable("project") String project,
+            @PathVariable("entity") String entity,
+            @RequestParam(value = "version") Long version) throws Exception {
+
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        entityDataRepository.updateVersion(project, entity, version);
 
         return ResponseEntity.ok().body(null);
     }

@@ -85,7 +85,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
           column.selectOptions = { };
           entityService.getData(vm.projectId, field.entityId).then(function (data) {
             for(var cptData in data) {
-              column.selectOptions[data[cptData]['#row_link_id#']] = data[cptData][field.entityField];
+              column.selectOptions[data[cptData]['#row_id#']] = data[cptData][field.entityField];
             }
           });
         };
