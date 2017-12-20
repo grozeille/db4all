@@ -12,7 +12,6 @@ import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
 import org.apache.hadoop.hbase.filter.KeyOnlyFilter;
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
@@ -35,7 +34,7 @@ public class EntityDataRepository {
 
     private final String cfData = "cfData";
 
-    private final String rowVersion = "#version#";
+    private final String rowMeta = "#meta#";
     private final String colVersion = "#last_version#";
     private final String colRowId = "#row_id#";
     private final String colRowIndex = "#row_index#";
@@ -53,16 +52,17 @@ public class EntityDataRepository {
             fieldTypes.put(f.getFieldId(), f.getType());
         }
 
-        final String name = projectId + "_" + entityId;
-        hbaseTemplate.execute(name, table -> {
+        final String tableName = projectId + "_" + entityId;
+        final String metaTableName = tableName + "_meta";
+
+        // get the current version
+        final Long currentVersionValue = getVersion(metaTableName);
+        final Long lastVersionValue = currentVersionValue + 1;
+
+        hbaseTemplate.execute(tableName, table -> {
             List<Put> puts = new ArrayList<>();
 
             byte[] cfDataBytes = Bytes.toBytes(cfData);
-
-            // get the current version
-
-            Long currentVersionValue = getVersion(name);
-            Long lastVersionValue = currentVersionValue + 1;
 
             int rowIndex = 0;
             String rowId;
@@ -168,38 +168,14 @@ public class EntityDataRepository {
             // save the data
             table.put(puts);
 
-            // update the current version
-            updateVersion(name, lastVersionValue);
-
-            // delete the previous version
-            long previousVersion = lastVersionValue - 1;
-
-            int bufferSize = 10000;
-
-            Scan scan = new Scan(Bytes.toBytes(Long.toString(previousVersion) + "#"), Bytes.toBytes(Long.toString(lastVersionValue) + "#"));
-            scan.setBatch(bufferSize);
-            FilterList filters = new FilterList(FilterList.Operator.MUST_PASS_ALL,
-                    new FirstKeyOnlyFilter(),
-                    new KeyOnlyFilter());
-            scan.setFilter(filters);
-            ResultScanner scanner = table.getScanner(scan);
-            List<Delete> deletes = new ArrayList<>();
-            for (Result r : scanner) {
-                deletes.add(new Delete(r.getRow()));
-
-                if(deletes.size() >= bufferSize){
-                    table.delete(deletes);
-                    deletes.clear();
-                }
-            }
-
-            if(deletes.size() > 0){
-                table.delete(deletes);
-                deletes.clear();
-            }
-
             return null;
         });
+
+        // update the current version
+        changeVersion(metaTableName, lastVersionValue);
+
+        // remove too old data
+        cleanOldVersions(tableName, lastVersionValue);
     }
 
     public EntityData findOne(String projectId, String entityId) throws Exception {
@@ -232,10 +208,11 @@ public class EntityDataRepository {
             }
         }
 
-        final String name = projectId + "_" + entityId;
+        final String tableName = projectId + "_" + entityId;
+        final String metaTableName = tableName + "_meta";
 
         // get the current version
-        final Long currentVersion = getVersion(name);
+        final Long currentVersion = getVersion(metaTableName);
 
         // get the data of the current version
 
@@ -245,7 +222,7 @@ public class EntityDataRepository {
         scan.addFamily(Bytes.toBytes(cfData));
         scan.setBatch(bufferSize);
 
-        List<Map<String, Object>> data = hbaseTemplate.find(name, scan, (result, rowNum) -> {
+        List<Map<String, Object>> data = hbaseTemplate.find(tableName, scan, (result, rowNum) -> {
 
             Map<String, Object> row = new HashMap<>();
 
@@ -300,7 +277,7 @@ public class EntityDataRepository {
         // update the value of the links
         Map<String, Map<String, String>> colToLinkCache = new HashMap<>();
 
-        // for each rows
+        // for each rows, update the links
         for(Map<String, Object> row : data) {
             for(String col : linkColumns) {
                 Object value = row.get(col);
@@ -326,7 +303,8 @@ public class EntityDataRepository {
                             final EntityField field = fieldMap.get(col);
 
                             final String linkTableName = projectId + "_" + field.getEntityId();
-                            final Long linkTableVersion = getVersion(linkTableName);
+                            final String linkMetaTableName = linkTableName + "_meta";
+                            final Long linkTableVersion = getVersion(linkMetaTableName);
                             final String linkVersionId = Long.toString(linkTableVersion) + "#" + id;
 
                             // find the data of the table
@@ -360,8 +338,15 @@ public class EntityDataRepository {
         return entityData;
     }
 
+    public Long changeVersion(String projectId, String entityId, Long version) throws IOException {
+        createTable(projectId, entityId);
+
+        String name = projectId + "_" + entityId + "_meta";
+        return changeVersion(name, version);
+    }
+
     private Long getVersion(String tableName) {
-        return hbaseTemplate.get(tableName, rowVersion, cfData, colVersion, (result, rowNum) -> {
+        return hbaseTemplate.get(tableName, rowMeta, cfData, colVersion, (result, rowNum) -> {
                 Cell cell = result.getColumnLatestCell(Bytes.toBytes(cfData), Bytes.toBytes(colVersion));
                 if(cell == null) {
                     return 0l;
@@ -375,14 +360,9 @@ public class EntityDataRepository {
             });
     }
 
-    public Long updateVersion(String projectId, String entityId, Long version) {
-        String name = projectId + "_" + entityId;
-        return updateVersion(name, version);
-    }
-
-    private Long updateVersion(String tableName, Long version) {
+    private Long changeVersion(String tableName, Long version) {
         return hbaseTemplate.execute(tableName, table -> {
-            Put put = new Put(Bytes.toBytes(rowVersion));
+            Put put = new Put(Bytes.toBytes(rowMeta));
             byte[] cfDataBytes = Bytes.toBytes(cfData);
             // add special column with index of the row
             put.addColumn(cfDataBytes, Bytes.toBytes(colVersion), Bytes.toBytes(version));
@@ -395,7 +375,7 @@ public class EntityDataRepository {
     private Long incrementVersion(String tableName) throws IOException {
         return hbaseTemplate.execute(tableName, table -> {
             byte[] cfDataBytes = Bytes.toBytes(cfData);
-            Increment inc = new Increment(Bytes.toBytes(rowVersion));
+            Increment inc = new Increment(Bytes.toBytes(rowMeta));
             inc.addColumn(cfDataBytes, Bytes.toBytes(colVersion), 1L);
             Result incResult = table.increment(inc);
             Cell lastVersion = incResult.getColumnLatestCell(cfDataBytes, Bytes.toBytes(colVersion));
@@ -404,6 +384,38 @@ public class EntityDataRepository {
                     lastVersion.getValueOffset(),
                     lastVersion.getValueLength());
             return Bytes.toLong(valueBytes);
+        });
+    }
+
+    private void cleanOldVersions(String tableName, Long lastVersion) throws IOException {
+        hbaseTemplate.execute(tableName, table -> {
+            // keep only 20 historical versions
+            long oldestVersion = lastVersion - 20;
+
+            int bufferSize = 10000;
+
+            Scan scan = new Scan(Bytes.toBytes(Long.toString(0l) + "#"), Bytes.toBytes(Long.toString(oldestVersion) + "#"));
+            scan.setBatch(bufferSize);
+            FilterList filters = new FilterList(FilterList.Operator.MUST_PASS_ALL,
+                    new FirstKeyOnlyFilter(),
+                    new KeyOnlyFilter());
+            scan.setFilter(filters);
+            ResultScanner scanner = table.getScanner(scan);
+            List<Delete> deletes = new ArrayList<>();
+            for (Result r : scanner) {
+                deletes.add(new Delete(r.getRow()));
+
+                if (deletes.size() >= bufferSize) {
+                    table.delete(deletes);
+                    deletes.clear();
+                }
+            }
+
+            if (deletes.size() > 0) {
+                table.delete(deletes);
+                deletes.clear();
+            }
+            return null;
         });
     }
 
@@ -450,6 +462,17 @@ public class EntityDataRepository {
         }catch (TableNotFoundException nf) {
             log.info("Table "+name+" not found, creating it...");
             HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
+            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
+            //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
+            tableDescriptor.addFamily(hColumnDescriptor);
+            hbaseAdmin.createTable(tableDescriptor);
+        }
+        String meta = name + "_meta";
+        try {
+            hbaseAdmin.getTableDescriptor(TableName.valueOf(meta));
+        }catch (TableNotFoundException nf) {
+            log.info("Table "+meta+" not found, creating it...");
+            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(meta));
             HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
             //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
             tableDescriptor.addFamily(hColumnDescriptor);

@@ -1,9 +1,7 @@
 package fr.grozeille.db4all.entity.web;
 
-import com.google.common.base.Strings;
 import fr.grozeille.db4all.entity.model.Entity;
 import fr.grozeille.db4all.entity.model.EntityData;
-import fr.grozeille.db4all.entity.model.EntityField;
 import fr.grozeille.db4all.entity.repositories.EntityDataRepository;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
 import fr.grozeille.db4all.entity.web.dto.EntityCreationRequest;
@@ -142,7 +140,6 @@ public class EntityResource {
         return ResponseEntity.ok().body(null);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/{project}/entity/{entity}/version", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateVersion(
             @PathVariable("project") String project,
@@ -153,7 +150,7 @@ public class EntityResource {
             return ResponseEntity.notFound().build();
         }
 
-        entityDataRepository.updateVersion(project, entity, version);
+        entityDataRepository.changeVersion(project, entity, version);
 
         return ResponseEntity.ok().body(null);
     }
