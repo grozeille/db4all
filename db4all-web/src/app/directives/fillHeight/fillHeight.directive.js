@@ -26,6 +26,19 @@ function fillHeight($window, $log) {
             }, // listener
             true // deep watch
           );
+
+          scope.$watch(
+            function () {
+              return {
+                visible: angular.element(value).is(':visible')
+              };
+            },
+            function () {
+              $log.info(' Element visibility changed! ');
+              computeHeight(scope, elem, attrs);
+            }, // listener
+            true // deep watch
+          );
         }
       });
     }
