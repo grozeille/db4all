@@ -2,10 +2,7 @@ package fr.grozeille.db4all.entity.repositories;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Ordering;
-import fr.grozeille.db4all.entity.model.Entity;
-import fr.grozeille.db4all.entity.model.EntityData;
-import fr.grozeille.db4all.entity.model.EntityField;
-import fr.grozeille.db4all.entity.model.EntityFieldType;
+import fr.grozeille.db4all.entity.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
@@ -370,6 +367,14 @@ public class EntityDataRepository {
             table.put(put);
             return version;
         });
+    }
+
+    public boolean acquireLock(String projectId, String entityId) {
+        return false;
+    }
+
+    public EntityLock getLock() {
+        return null;
     }
 
     private Long incrementVersion(String tableName) throws IOException {

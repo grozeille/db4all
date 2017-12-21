@@ -2,13 +2,16 @@ package fr.grozeille.db4all.entity.web;
 
 import fr.grozeille.db4all.entity.model.Entity;
 import fr.grozeille.db4all.entity.model.EntityData;
+import fr.grozeille.db4all.entity.model.EntityLock;
 import fr.grozeille.db4all.entity.repositories.EntityDataRepository;
 import fr.grozeille.db4all.entity.repositories.EntityRepository;
 import fr.grozeille.db4all.entity.web.dto.EntityCreationRequest;
+import fr.grozeille.db4all.entity.web.dto.EntityLockResponse;
 import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,9 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +129,37 @@ public class EntityResource {
 
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value = "/{project}/entity/{entity}/lock", method = RequestMethod.GET)
+    public ResponseEntity<EntityLock> getLock(
+            @PathVariable("project") String project,
+            @PathVariable("entity") String entity) throws Exception {
+
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.ok(entityDataRepository.getLock());
+    }
+
+    @RequestMapping(value = "/{project}/entity/{entity}/lock", method = RequestMethod.PUT)
+    public ResponseEntity<EntityLockResponse> acquireLock(
+            @PathVariable("project") String project,
+            @PathVariable("entity") String entity,
+            @ApiIgnore @ApiParam(hidden = true)  Principal principal) throws Exception {
+
+        if (checkEntityExists(project, entity)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // TODO: get the principal & lock ID from the session for lock renewal
+
+        EntityLockResponse response = new EntityLockResponse();
+        response.setLocked(entityDataRepository.acquireLock(project, entity));
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @RequestMapping(value = "/{project}/entity/{entity}/data", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateData(
