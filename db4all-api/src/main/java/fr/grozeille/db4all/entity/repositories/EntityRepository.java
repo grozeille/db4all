@@ -13,8 +13,9 @@ import fr.grozeille.db4all.project.model.Project;
 import fr.grozeille.db4all.project.model.ProjectSearchItem;
 import fr.grozeille.db4all.project.repositories.ProjectRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class EntityRepository {
     private HbaseTemplate hbaseTemplate;
 
     @Autowired
+    private HBaseAdmin hbaseAdmin;
+
+    @Autowired
     private EntitySearchItemRepository entitySearchItemRepository;
 
     @Autowired
@@ -43,6 +47,8 @@ public class EntityRepository {
     private final String tableName = "projects";
 
     private final String cfEntities = "cfEntities";
+
+    private final String cfData = "cfData";
 
     public EntityRepository(){
         objectMapper = new ObjectMapper();
@@ -58,8 +64,11 @@ public class EntityRepository {
     public Entity save(String projectId, Entity entity) throws Exception {
         Project project = projectRepository.findOne(projectId);
 
+        boolean isNew = false;
+
         if(Strings.isNullOrEmpty(entity.getId())){
             entity.setId(UUID.randomUUID().toString());
+            isNew = true;
         }
         byte[] data = objectMapper.writeValueAsBytes(entity);
         hbaseTemplate.put(tableName, projectId, cfEntities, entity.getId(), data);
@@ -67,6 +76,10 @@ public class EntityRepository {
         EntitySearchItem searchItem = toEntitySearchItem(project, entity);
 
         this.entitySearchItemRepository.save(searchItem);
+
+        if(isNew) {
+            createTable(projectId, entity.getId());
+        }
 
         return entity;
     }
@@ -183,5 +196,30 @@ public class EntityRepository {
                     new Sort(Sort.Direction.ASC, "projectName", "name"));
         }
         return pageable;
+    }
+
+    private void createTable(String projectId, String entityId) throws IOException {
+        String name = projectId + "_" + entityId;
+        try {
+            hbaseAdmin.getTableDescriptor(TableName.valueOf(name));
+        }catch (TableNotFoundException nf) {
+            log.info("Table "+name+" not found, creating it...");
+            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
+            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
+            //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
+            tableDescriptor.addFamily(hColumnDescriptor);
+            hbaseAdmin.createTable(tableDescriptor);
+        }
+        String meta = name + "_meta";
+        try {
+            hbaseAdmin.getTableDescriptor(TableName.valueOf(meta));
+        }catch (TableNotFoundException nf) {
+            log.info("Table "+meta+" not found, creating it...");
+            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(meta));
+            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
+            //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
+            tableDescriptor.addFamily(hColumnDescriptor);
+            hbaseAdmin.createTable(tableDescriptor);
+        }
     }
 }

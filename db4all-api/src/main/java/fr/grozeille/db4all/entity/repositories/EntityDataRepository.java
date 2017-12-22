@@ -41,8 +41,6 @@ public class EntityDataRepository {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void save(String projectId, String entityId, EntityData data) throws Exception {
-        createTable(projectId, entityId);
-
         Entity entity = entityRepository.findOne(projectId, entityId);
         Map<Integer, EntityFieldType> fieldTypes = new HashMap<>();
         for(EntityField f : entity.getFields()) {
@@ -336,8 +334,6 @@ public class EntityDataRepository {
     }
 
     public Long changeVersion(String projectId, String entityId, Long version) throws IOException {
-        createTable(projectId, entityId);
-
         String name = projectId + "_" + entityId + "_meta";
         return changeVersion(name, version);
     }
@@ -458,30 +454,5 @@ public class EntityDataRepository {
 
     public void delete(String projectId, String entityId) {
 
-    }
-
-    private void createTable(String projectId, String entityId) throws IOException {
-        String name = projectId + "_" + entityId;
-        try {
-            hbaseAdmin.getTableDescriptor(TableName.valueOf(name));
-        }catch (TableNotFoundException nf) {
-            log.info("Table "+name+" not found, creating it...");
-            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
-            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
-            //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
-            tableDescriptor.addFamily(hColumnDescriptor);
-            hbaseAdmin.createTable(tableDescriptor);
-        }
-        String meta = name + "_meta";
-        try {
-            hbaseAdmin.getTableDescriptor(TableName.valueOf(meta));
-        }catch (TableNotFoundException nf) {
-            log.info("Table "+meta+" not found, creating it...");
-            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(meta));
-            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(cfData);
-            //hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
-            tableDescriptor.addFamily(hColumnDescriptor);
-            hbaseAdmin.createTable(tableDescriptor);
-        }
     }
 }
