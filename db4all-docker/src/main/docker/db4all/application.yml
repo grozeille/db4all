@@ -16,9 +16,9 @@ spring:
 db4all:
   adminToken: e5e68d89adc641b2946b6c770c4fd7c7e23f278e
   solr:
-    zkUrl: localhost:9983
+    zkUrl: solrcloud:9983
   hbase:
-    zkUrl: localhost:2181
+    zkUrl: hbase:2181
 
 
 security:
