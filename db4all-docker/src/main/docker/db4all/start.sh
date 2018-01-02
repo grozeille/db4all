@@ -1,1 +1,1 @@
-java -jar db4all.jar
+java -Dlogging.config=./logback.xml -Dloader.path=lib -jar db4all.jar

@@ -6,6 +6,11 @@ set -euo pipefail
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export JAVA_HOME="${JAVA_HOME:-/usr}"
+
+# update log4j to use GELF if provided
+/update-gelf-logback.sh /tmp/logback.xml /db4all/logback.xml
+
+
 export SOLR_URL=http://solrcloud:8983/solr
 
 # wait for solr

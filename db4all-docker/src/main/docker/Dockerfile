@@ -27,8 +27,15 @@ RUN set -euxo pipefail && \
 
 COPY profile.d/java.sh /etc/profile.d/
 
+
 RUN mkdir -p /db4all
-COPY db4all ./db4all/
-COPY maven/ ./db4all/
+
+COPY update-gelf-logback.sh /
+COPY logback.xml /tmp
+
+RUN chmod 0555 /update-gelf-logback.sh
+
+COPY db4all /db4all/
+COPY maven/ /db4all/
 
 CMD "/entrypoint.sh"

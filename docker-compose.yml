@@ -1,6 +1,6 @@
 #  Author: Mathias Kluba
 
-version: '2.1'
+version: '2.0'
 services:
   db4all:
     image: grozeille/db4all:1.0-SNAPSHOT
@@ -9,8 +9,13 @@ services:
     links:
       - "hbase:hbase"
       - "solrcloud:solrcloud"
+    labels:
+      io.rancher.container.pull_image: always
+    #environment:
+    #  - GRAYLOG2_HOST=graylog
+    #  - GRAYLOG2_PORT=12201
   hbase:
-    image: harisekhon/hbase:1.2
+    image: grozeille/hbase:latest
     hostname: hbase
     ports:
       - 2181:2181
@@ -22,15 +27,25 @@ services:
       - 16010:16010
       - 16201:16201
       - 16301:16301
-    #volumes:
-    #  - /tmp/hbase-root/:/tmp/hbase-root/
+    labels:
+      io.rancher.container.pull_image: always
+    volumes:
+      - /tmp/hbase-root
+    #environment:
+    #  - GRAYLOG2_HOST=graylog
+    #  - GRAYLOG2_PORT=12201
   solrcloud:
     # using my own Docker images now as official solr doesn't have builds < 5
-    image: harisekhon/solrcloud:7.1
+    image: grozeille/solrcloud:latest
     hostname: solrcloud
     ports:
       - 8983:8983
       - 8984:8984
       - 9983:9983
-    #volumes:
-    #  - /tmp/solr-cloud/:/solr/example/cloud/
+    labels:
+      io.rancher.container.pull_image: always
+    volumes:
+      - /solr/example/cloud
+    #environment:
+    #  - GRAYLOG2_HOST=graylog
+    #  - GRAYLOG2_PORT=12201
