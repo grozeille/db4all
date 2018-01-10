@@ -28,8 +28,6 @@ require('handsontable/dist/pikaday/pikaday.css');
 require('handsontable/dist/handsontable.full');
 require('handsontable/dist/handsontable.full.css');
 
-require('ng-handsontable/dist/ngHandsontable');
-
 require('angular-hotkeys/build/hotkeys.min');
 require('angular-hotkeys/build/hotkeys.min.css');
 
@@ -45,7 +43,6 @@ angular
     'ngSanitize',
     'ngTagsInput',
     'ngFileUpload',
-    'ngHandsontable',
     'cfp.hotkeys']);
 
 require('./filters');

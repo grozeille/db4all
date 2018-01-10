@@ -64,9 +64,7 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
         $: "jquery",
-        jQuery: "jquery"
-    }),
-    new webpack.ProvidePlugin({
+        jQuery: "jquery",
         Handsontable: "handsontable/dist/handsontable.full.js"
     }),
     new webpack.LoaderOptionsPlugin({

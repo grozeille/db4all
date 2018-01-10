@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function LinksController($timeout, $log, $location, $scope, $filter, $uibModalInstance, entityService, projectId, entityId, sourceField, links) {
+function LinksController($timeout, $log, $location, $scope, $filter, $uibModalInstance, $document, entityService, projectId, entityId, sourceField, links, handsonTableRegistryService) {
   var vm = this;
 
   vm.alerts = [];
@@ -28,11 +28,14 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
   };
   vm.filteredData = [];
   vm.data = [];
-  vm.columns = [];
-  vm.colWidths = [];
   vm.settings = {
     height: 300,
     readOnly: true,
+    colHeaders: true,
+    rowHeaders: true,
+    colWidths: [],
+    columns: [],
+    minSpareRows: 0,
     manualColumnResize: true,
     manualRowResize: false,
     columnSorting: true,
@@ -67,7 +70,7 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
     }
   };
 
-  vm.refresh = function() {
+  vm.load = function() {
     var linkSelected = {};
     for(var linkCpt in vm.links) {
       var linkValue = vm.links[linkCpt];
@@ -81,16 +84,17 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
           vm.entity.fields = [];
         }
 
-        vm.colWidths = [];
-        vm.columns = [];
-        vm.columns.push({
+        vm.settings.colWidths = [];
+        vm.settings.columns = [];
+
+        vm.settings.columns.push({
           title: 'Sélection',
           data: '##selection##',
           readOnly: false,
           renderer: 'checkbox',
           editor: 'checkbox'
         });
-        vm.colWidths.push(80);
+        vm.settings.colWidths.push(80);
         for(var cptField in vm.entity.fields) {
           var field = vm.entity.fields[cptField];
 
@@ -98,7 +102,7 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
           if(angular.isDefined(field.width) && field.width !== 0) {
             fieldWidth = field.width;
           }
-          vm.colWidths.push(fieldWidth);
+          vm.settings.colWidths.push(fieldWidth);
 
           var column = {
             title: field.name,
@@ -134,7 +138,7 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
           else if(field.type === 'LINK_MULTIPLE') {
             column.renderer = vm.linkRenderer;
           }
-          vm.columns.push(column);
+          vm.settings.columns.push(column);
         }
 
         return entityService.getData(vm.projectId, vm.entityId).then(function (data) {
@@ -196,9 +200,9 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
     }
   };
 
-  activate();
-
   function activate() {
-    vm.refresh();
+    vm.load();
   }
+
+  activate();
 }

@@ -39,16 +39,11 @@
   
       <!-- Left table -->
       <div class="col-sm-12">
-        <hot-table
-                hot-id="link-handsontable"
-                settings="links.settings"
-                row-headers="true"
-                col-headers="true"
-                col-widths="links.colWidths"
-                min-spare-rows="0"
-                datarows="links.filteredData"
-                columns="links.columns">
-        </hot-table>
+        <handson-table
+              id="link-handsontable"
+              data="links.filteredData"
+              settings="links.settings">
+        </handson-table>
       </div>
   
   </div>

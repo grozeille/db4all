@@ -76,17 +76,13 @@
 
   <div class="row">
 
-    <div class="col-sm-12" fill-height="fill-height-substract">
-      <hot-table hot-id="entity-handsontable"
-                 settings="entityData.settings"
-                 row-headers="true"
-                 col-headers="true"
-                 col-widths="entityData.colWidths"
-                 min-spare-rows="1"
-                 datarows="entityData.filteredData"
-                 columns="entityData.columns"">
-        
-      </hot-table>
+    <div class="col-sm-12">
+      <handson-table
+              id="entity-handsontable"
+              data="entityData.filteredData"
+              settings="entityData.settings"
+              fill-height="fill-height-substract">
+      </handson-table>
     </div>
   </div>
 

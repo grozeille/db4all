@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $document, entityService, projectService, hotRegisterer, hotkeys) {
+function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $document, entityService, projectService, hotkeys, handsonTableRegistryService) {
   var vm = this;
 
   vm.alerts = [];
@@ -32,9 +32,13 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
   vm.fields = {};
   vm.filteredData = [];
   vm.data = [];
-  vm.columns = [];
-  vm.colWidths = [];
   vm.settings = {
+    copyPaste: true,
+    colHeaders: true,
+    rowHeaders: true,
+    colWidths: [],
+    columns: [],
+    minSpareRows: 1,
     manualColumnResize: true,
     manualRowResize: false,
     columnSorting: true,
@@ -49,6 +53,9 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     },
     onAfterCreateRow: function(index, amount) {
       $log.info('onAfterCreateRow call => index:' + index + ', amount: ' + amount);
+    },
+    onBeforeCopy: function(data, coords) {
+      $log.info('onBeforeCopy => ' + data);
     }
   };
 
@@ -56,7 +63,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
   vm.currentColumn = '';
   vm.applyFilter = false;
 
-  vm.refresh = function() {
+  vm.load = function() {
     projectService.getById(vm.projectId)
       .then(function(data) {
         vm.project = data;
@@ -78,8 +85,8 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
           vm.entity.filters = [];
         }
 
-        vm.colWidths = [];
-        vm.columns = [];
+        vm.settings.colWidths = [];
+        vm.settings.columns = [];
 
         var loadLinkDropDownData = function(column, field) {
           column.selectOptions = { };
@@ -97,7 +104,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
           if(angular.isDefined(field.width) && field.width !== 0) {
             fieldWidth = field.width;
           }
-          vm.colWidths.push(fieldWidth);
+          vm.settings.colWidths.push(fieldWidth);
 
           vm.fields[field.fieldId] = field;
 
@@ -148,7 +155,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
             column.editor = vm.linkEditor;
             column.renderer = vm.linkRenderer;
           }
-          vm.columns.push(column);
+          vm.settings.columns.push(column);
         }
 
         return entityService.getData(vm.projectId, vm.entityId).then(function (data) {
@@ -165,7 +172,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
   vm.save = function() {
     vm.saving = true;
 
-    var handsontable = hotRegisterer.getInstance('entity-handsontable');
+    var handsontable = handsonTableRegistryService.getInstance('entity-handsontable');
     for(var cptField in vm.entity.fields) {
       var field = vm.entity.fields[cptField];
       field.width = handsontable.getColWidth(cptField);
@@ -494,7 +501,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
       }
     });
 
-    vm.refresh();
+    vm.load();
   }
 
   activate();

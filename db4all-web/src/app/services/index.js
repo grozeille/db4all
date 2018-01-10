@@ -11,4 +11,5 @@ angular.module('datalakeToolbox')
   .service('adminService', require('./admin/admin.service'))
   .service('projectService', require('./project/project.service'))
   .service('entityService', require('./entity/entity.service'))
-  .service('userService', require('./user/user.service'));
+  .service('userService', require('./user/user.service'))
+  .service('handsonTableRegistryService', require('./handsonTableRegistry/handsonTableRegistry.service'));

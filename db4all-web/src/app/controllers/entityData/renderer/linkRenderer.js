@@ -12,6 +12,9 @@ module.exports = {
       }
       td.innerHTML = linkValue.join(', ');
     }
+    else {
+      td.innerHTML = '';
+    }
 
     return td;
   }
