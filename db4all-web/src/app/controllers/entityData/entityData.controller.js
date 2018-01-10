@@ -45,16 +45,16 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     allowInvalid: false,
     autoColumnSize: false,
     contextMenu: ['row_above', 'row_below', 'remove_row'],
-    onAfterChange: function(event, type) {
+    afterChange: function(event, type) {
       vm.onAfterChange(this, event, type);
     },
-    onAfterSelection: function(row, column) {
+    afterSelection: function(row, column) {
       vm.onAfterSelection(this, row, column);
     },
-    onAfterCreateRow: function(index, amount) {
+    afterCreateRow: function(index, amount) {
       $log.info('onAfterCreateRow call => index:' + index + ', amount: ' + amount);
     },
-    onBeforeCopy: function(data, coords) {
+    beforeCopy: function(data, coords) {
       $log.info('onBeforeCopy => ' + data);
     }
   };

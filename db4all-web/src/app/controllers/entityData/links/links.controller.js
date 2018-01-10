@@ -40,7 +40,7 @@ function LinksController($timeout, $log, $location, $scope, $filter, $uibModalIn
     manualRowResize: false,
     columnSorting: true,
     autoColumnSize: false,
-    onAfterChange: function(event, type) {
+    afterChange: function(event, type) {
       vm.onAfterChange(this, event, type);
     }
   };
