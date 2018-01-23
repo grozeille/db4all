@@ -55,7 +55,50 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
       $log.info('onAfterCreateRow call => index:' + index + ', amount: ' + amount);
     },
     beforeCopy: function(data, coords) {
+      for(var cptRow in data) {
+        var row = data[cptRow];
+
+        for(var cptCol in row) {
+          var cptColInt = parseInt(cptCol, 10);
+          var cptField = coords[0].startCol + cptColInt;
+          var field = vm.entity.fields[cptField];
+          var col = row[cptCol];
+
+          if(angular.isArray(col)) {
+            row[cptCol] = angular.toJson(col);
+          }
+        }
+      }
       $log.info('onBeforeCopy => ' + data);
+    },
+    beforePaste: function(data, coords) {
+      for(var cptRow in data) {
+        var cptRowInt = parseInt(cptRow, 10);
+        var row = data[cptRow];
+
+        for(var cptCol in row) {
+          var cptColInt = parseInt(cptCol, 10);
+          var cptField = coords[0].startCol + cptColInt;
+          var field = vm.entity.fields[cptField];
+          var col = row[cptCol];
+
+          if(field.type === 'LINK' || field.type === 'LINK_MULTIPLE') {
+            var cptRowData = coords[0].startRow + cptRowInt;
+            if(angular.isUndefined(vm.data[cptRowData])) {
+              vm.data[cptRowData] = {};
+            }
+
+            if(col === '') {
+              row[cptCol] = null;
+            }
+            else {
+              row[cptCol] = angular.fromJson(col);
+              vm.data[cptRowData][cptField + 1] = row[cptCol];
+            }
+          }
+        }
+      }
+      $log.info('onBeforePaste => ' + data);
     }
   };
 
@@ -420,7 +463,11 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     else {
       vm.currentColumn = core.getDataAtCell(row, column);
     }
+
+    // eslint-disable-next-line angular/no-private-call
+    // if(!$scope.$$phase) {
     $scope.$apply();
+    // }
   };
 
   vm.onSaveFilter = function(newFilter) {
