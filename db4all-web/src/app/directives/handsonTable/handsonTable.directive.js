@@ -16,13 +16,13 @@ module.exports = function() {
         pre: function($scope, $element, attributes, controller, transcludeFn) {
           // eslint-disable-next-line angular/document-service
           var container = document.createElement('div');
-          if(angular.isDefined(controller.id)) {
-            container.id = controller.id;
+          if(angular.isDefined(controller.hotId)) {
+            container.hotId = controller.hotId;
           }
           $element[0].appendChild(container);
           controller.handsontable = new Handsontable(container, controller.settings);
-          if(angular.isDefined(controller.id)) {
-            controller.handsonTableRegistryService.registerInstance(controller.id, controller.handsontable);
+          if(angular.isDefined(controller.hotId)) {
+            controller.handsonTableRegistryService.registerInstance(controller.hotId, controller.handsontable);
           }
         },
         post: function($scope, $element, attributes, controller, transcludeFn) {
