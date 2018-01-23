@@ -317,7 +317,7 @@ public class EntityDataRepository {
 
                                return parseColumnValue(valueBytes, Integer.toString(linkField.getFieldId()), linkField.getType());
                             });
-                            cachedValue = newLinkValue.toString();
+                            cachedValue = newLinkValue == null ? null : newLinkValue.toString();
                             linkCache.put(id, cachedValue);
                         }
 
