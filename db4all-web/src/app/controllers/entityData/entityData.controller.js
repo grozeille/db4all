@@ -9,7 +9,7 @@ module.exports = {
 var Handsontable = require('Handsontable');
 
 /** @ngInject */
-function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $document, entityService, projectService, hotkeys, handsonTableRegistryService) {
+function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $document, $transitions, $q, entityService, projectService, hotkeys, handsonTableRegistryService) {
   var vm = this;
 
   vm.alerts = [];
@@ -32,6 +32,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
   vm.fields = {};
   vm.filteredData = [];
   vm.data = [];
+  vm.dirty = false;
   vm.settings = {
     copyPaste: true,
     colHeaders: true,
@@ -47,6 +48,9 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     contextMenu: ['row_above', 'row_below', 'remove_row'],
     afterChange: function(event, type) {
       vm.onAfterChange(this, event, type);
+      if(type !== 'loadData') {
+        vm.dirty = true;
+      }
     },
     afterSelection: function(row, column) {
       vm.onAfterSelection(this, row, column);
@@ -202,8 +206,10 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
         }
 
         return entityService.getData(vm.projectId, vm.entityId).then(function (data) {
+          var handsontable = handsonTableRegistryService.getInstance('entity-handsontable');
           vm.data = data;
           vm.filteredData = vm.data;
+          vm.dirty = false;
         });
       })
       .catch(function(error) {
@@ -229,6 +235,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     .then(function(request) {
       vm.alerts.push({msg: 'Entity saved.', type: 'info'});
       vm.saving = false;
+      vm.dirty = false;
     })
     .catch(function(error) {
       vm.saving = false;
@@ -549,6 +556,47 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
     });
 
     vm.load();
+
+    vm.dirty = false;
+
+    $transitions.onEnter({}, function($transition$) {
+      $log.info('before change ? ' + vm.dirty);
+      if(vm.dirty) {
+        var modalInstance = $uibModal.open({
+          templateUrl: 'quit.html',
+          controllerAs: 'quit',
+          controller: function($uibModalInstance, parent) {
+            var vm = this;
+            vm.ok = function() {
+              parent.dirty = false;
+              $uibModalInstance.close();
+            };
+            vm.cancel = function() {
+              $uibModalInstance.dismiss('cancel');
+            };
+          },
+          resolve: {
+            parent: function() {
+              return vm;
+            }
+          }
+        });
+        // return $q.reject();
+        return modalInstance.result;
+      }
+    });
+
+    // $locationChangeStart
+    // $scope.$on('$stateChangeStart', function(event) {
+    //  $log.info('before change ? ' + vm.dirty);
+    //  if(vm.dirty) {
+        // eslint-disable-next-line no-alert
+        // var answer = confirm('Are you sure you want to navigate away from this page');
+        // if(!answer) {
+        //   event.preventDefault();
+        // }
+    //  }
+    // });
   }
 
   activate();

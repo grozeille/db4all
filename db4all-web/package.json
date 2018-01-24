@@ -1,6 +1,6 @@
 {
   "name": "db4all",
-  "description": "",
+  "description": "UI for DB4ALL",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
     "angular-ui-ace": "^0.2.3",
     "angular-ui-bootstrap": "2.0.0",
     "angular-ui-grid": "3.2.9",
-    "angular-ui-router": "1.0.0-beta.3",
+    "@uirouter/angularjs": "1.0.13",
     "angular-ui-router-uib-modal": "^0.0.11",
     "bootstrap": "^3.3.7",
     "bootstrap-filestyle": "^1.2.1",

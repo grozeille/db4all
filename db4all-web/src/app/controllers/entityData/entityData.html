@@ -8,6 +8,19 @@
 
   </div>
 
+  <script type="text/ng-template" id="quit.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Quitter ?</h3>
+    </div>
+    <div class="modal-body">
+      <p>Il y a des modifications non sauvegardées. Voulez-vous quitter</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" type="button" ng-click="quit.ok()">OK</button>
+      <button class="btn btn-default" type="button" ng-click="quit.cancel()">Annuler</button>
+    </div>
+  </script>
+
   <alerts-popup alerts="entityData.alerts"></alerts-popup>
 
   <div class="row fill-height-substract" ng-show="false">
