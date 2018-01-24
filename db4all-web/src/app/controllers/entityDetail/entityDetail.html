@@ -6,6 +6,19 @@
 
   <alerts-popup alerts="entityDetail.alerts"></alerts-popup>
 
+  <script type="text/ng-template" id="quit.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Quitter ?</h3>
+    </div>
+    <div class="modal-body">
+      <p>Il y a des modifications non sauvegardées. Voulez-vous quitter ?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" type="button" ng-click="quit.ok()">OK</button>
+      <button class="btn btn-default" type="button" ng-click="quit.cancel()">Annuler</button>
+    </div>
+  </script>
+
   <div class="row fill-height-substract">
 
     <div class="col-sm-9">
@@ -43,7 +56,7 @@
                 <div class="panel-body">
 
                   <fieldset>
-                    <form style="padding: 0px;">
+                    <form style="padding: 0px;" name="entityDetail.form">
 
                       <div class="row">
 

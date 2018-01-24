@@ -559,8 +559,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
 
     vm.dirty = false;
 
-    $transitions.onEnter({}, function($transition$) {
-      $log.info('before change ? ' + vm.dirty);
+    vm.onEnterHook = $transitions.onEnter({}, function($transition$) {
       if(vm.dirty) {
         var modalInstance = $uibModal.open({
           templateUrl: 'quit.html',
@@ -568,6 +567,7 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
           controller: function($uibModalInstance, parent) {
             var vm = this;
             vm.ok = function() {
+              parent.onEnterHook();
               parent.dirty = false;
               $uibModalInstance.close();
             };
@@ -584,19 +584,10 @@ function EntityDataController($scope, $log, $uibModal, $state, $stateParams, $do
         // return $q.reject();
         return modalInstance.result;
       }
+      else {
+        vm.onEnterHook();
+      }
     });
-
-    // $locationChangeStart
-    // $scope.$on('$stateChangeStart', function(event) {
-    //  $log.info('before change ? ' + vm.dirty);
-    //  if(vm.dirty) {
-        // eslint-disable-next-line no-alert
-        // var answer = confirm('Are you sure you want to navigate away from this page');
-        // if(!answer) {
-        //   event.preventDefault();
-        // }
-    //  }
-    // });
   }
 
   activate();

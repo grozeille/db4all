@@ -7,7 +7,7 @@ module.exports = {
 };
 
 /** @ngInject */
-function EntityDetailController($log, $uibModal, $state, $stateParams, entityService, projectService) {
+function EntityDetailController($log, $uibModal, $state, $stateParams, $transitions, $scope, entityService, projectService) {
   var vm = this;
 
   vm.saving = false;
@@ -26,6 +26,8 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
   vm.project = {
     name: ''
   };
+  vm.dirty = false;
+  vm.form = {};
 
   vm.currentField = null;
   vm.currentLinkEntity = null;
@@ -101,6 +103,8 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
           refreshFields();
 
           vm.refreshEntities('');
+
+          vm.dirty = false;
         })
         .catch(function(error) {
           vm.alerts.push({msg: 'Unable to get entity ' + vm.entityId + '.', type: 'danger'});
@@ -123,6 +127,8 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
         refreshFields();
         vm.alerts.push({msg: 'Entity saved.', type: 'info'});
         vm.saving = false;
+        vm.dirty = false;
+        vm.form.$setPristine();
       })
       .catch(function(error) {
         vm.saving = false;
@@ -151,6 +157,7 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
   }
 
   vm.addNewField = function() {
+    vm.dirty = true;
     var maxFieldId = 0;
     for(var fieldCpt in vm.entity.fields) {
       var field = vm.entity.fields[fieldCpt];
@@ -166,6 +173,7 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
   };
 
   vm.saveField = function() {
+    vm.dirty = true;
     vm.currentField.typeString = toTextType(vm.currentField.type);
     vm.entity.fields[vm.currentFieldIndex] = vm.currentField;
     vm.currentFieldIndex = -1;
@@ -201,6 +209,7 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
 
   vm.removeField = function(index) {
     vm.entity.fields.splice(index, 1);
+    vm.dirty = true;
   };
 
   vm.moveFieldUp = function(index) {
@@ -210,6 +219,7 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
     var field = vm.entity.fields[index];
     vm.removeField(index);
     vm.entity.fields.splice(index - 1, 0, field);
+    vm.dirty = true;
   };
 
   vm.moveFieldDown = function(index) {
@@ -219,6 +229,7 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
     var field = vm.entity.fields[index];
     vm.removeField(index);
     vm.entity.fields.splice(index + 1, 0, field);
+    vm.dirty = true;
   };
 
   vm.viewEntity = function() {
@@ -227,6 +238,37 @@ function EntityDetailController($log, $uibModal, $state, $stateParams, entitySer
 
   function activate() {
     vm.refresh();
+
+    vm.onEnterHook = $transitions.onEnter({}, function($transition$) {
+      if(vm.dirty || (angular.isDefined(vm.form) && vm.form.$dirty)) {
+        var modalInstance = $uibModal.open({
+          templateUrl: 'quit.html',
+          controllerAs: 'quit',
+          controller: function($uibModalInstance, parent) {
+            var vm = this;
+            vm.ok = function() {
+              parent.onEnterHook();
+              parent.dirty = false;
+              parent.form.$setPristine();
+              $uibModalInstance.close();
+            };
+            vm.cancel = function() {
+              $uibModalInstance.dismiss('cancel');
+            };
+          },
+          resolve: {
+            parent: function() {
+              return vm;
+            }
+          }
+        });
+        // return $q.reject();
+        return modalInstance.result;
+      }
+      else {
+        vm.onEnterHook();
+      }
+    });
   }
 
   activate();

@@ -7,7 +7,7 @@ module.exports = {
 };
 
 /** @ngInject */
-function ProjectDetailController($log, $uibModal, $stateParams, projectService) {
+function ProjectDetailController($log, $uibModal, $stateParams, $transitions, projectService) {
   var vm = this;
 
   vm.alerts = [];
@@ -63,6 +63,36 @@ function ProjectDetailController($log, $uibModal, $stateParams, projectService) 
 
   function activate() {
     vm.refresh();
+
+    vm.onEnterHook = $transitions.onEnter({}, function($transition$) {
+      if(angular.isDefined(vm.form) && vm.form.$dirty) {
+        var modalInstance = $uibModal.open({
+          templateUrl: 'quit.html',
+          controllerAs: 'quit',
+          controller: function($uibModalInstance, parent) {
+            var vm = this;
+            vm.ok = function() {
+              parent.onEnterHook();
+              parent.form.$setPristine();
+              $uibModalInstance.close();
+            };
+            vm.cancel = function() {
+              $uibModalInstance.dismiss('cancel');
+            };
+          },
+          resolve: {
+            parent: function() {
+              return vm;
+            }
+          }
+        });
+        // return $q.reject();
+        return modalInstance.result;
+      }
+      else {
+        vm.onEnterHook();
+      }
+    });
   }
 
   activate();
