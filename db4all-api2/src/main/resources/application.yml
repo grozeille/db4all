@@ -1,0 +1,36 @@
+server:
+  port: 9800
+
+logging.level.org.hibernate.SQL: debug
+logging.level.org.apache.hadoop.yarn.util.RackResolver: warn
+
+
+spring:
+  jackson.serialization.write_dates_as_timestamps: false
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 500Mb
+      max-request-size: 550Mb
+
+db4all:
+  adminToken: test
+  para:
+    accessKey: app:db4all
+    secretKey: cEp5NGGLIPDoQkm7EezPGGe5DOtezMjUQKNjSoS8ch8mubxx/kUM+g==
+    url: http://localhost:9090
+
+
+security:
+  enabled: false
+  oauth2:
+    client:
+      clientId:
+      clientSecret:
+      accessTokenUri:
+      userAuthorizationUri:
+      tokenName:
+      authenticationScheme:
+      clientAuthenticationScheme:
+    resource:
+      userInfoUri:

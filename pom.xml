@@ -44,6 +44,7 @@
         <module>db4all-web</module>
         <module>db4all-api</module>
         <module>db4all-docker</module>
+        <module>db4all-api2</module>
     </modules>
 
     <build>
