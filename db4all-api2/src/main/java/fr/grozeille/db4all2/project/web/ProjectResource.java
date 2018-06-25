@@ -33,6 +33,7 @@ public class ProjectResource {
     @Autowired
     private ParaClient paraClient;
 
+    @CrossOrigin
     @RequestMapping(value = "", method = RequestMethod.GET)
     public PageResult<Project> filter(
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -54,6 +55,7 @@ public class ProjectResource {
         return pageResult;
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Project> get(@PathVariable("id") String id) {
         Project p = getProject(id);
@@ -64,6 +66,7 @@ public class ProjectResource {
         return ResponseEntity.ok(p);
     }
 
+    @CrossOrigin
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> create(@RequestBody ProjectCreationRequest request) throws Exception {
@@ -80,6 +83,7 @@ public class ProjectResource {
         return ResponseEntity.created(location).build();
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Void> update(
             @PathVariable("id") String id,
@@ -106,6 +110,7 @@ public class ProjectResource {
         return ResponseEntity.created(location).build();
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         Project p = getProject(id);

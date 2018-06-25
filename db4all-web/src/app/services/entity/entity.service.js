@@ -30,12 +30,28 @@ function entityService($log, $http, $location, $filter, $q, $rootScope) {
     if(entity.id) {
       var putUrl = vm.apiHost + '/project/' + projectId + '/table/' + entity.id;
 
-      return $http.put(putUrl, entity).catch(vm.catchServiceException);
+      return $http
+        .put(putUrl, entity)
+        .then(function(request) {
+          return $http.get(putUrl);
+        })
+        .catch(vm.catchServiceException);
     }
     else {
       var postUrl = vm.apiHost + '/project/' + projectId + '/table';
 
-      return $http.post(postUrl, entity).catch(vm.catchServiceException);
+      // create the initial project, then save all fields, then get the result
+      return $http
+        .post(postUrl, entity)
+        .then(function(request) {
+          var location = request.headers().location;
+          return $http
+            .put(location, entity)
+            .then(function(request) {
+              return $http.get(location);
+            });
+        })
+        .catch(vm.catchServiceException);
     }
   }
 

@@ -35,6 +35,7 @@ public class TableResource {
     private ParaClient paraClient;
 
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table", method = RequestMethod.POST)
     public ResponseEntity<Void> create(
             @PathVariable("project") String project,
@@ -60,6 +61,7 @@ public class TableResource {
         return ResponseEntity.created(location).build();
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table/{table}", method = RequestMethod.PUT)
     public ResponseEntity<Void> update(
             @PathVariable("project") String project,
@@ -83,6 +85,8 @@ public class TableResource {
         t.setComment(request.getComment());
         t.setTags(Arrays.asList(request.getTags()));
         t.setFields(request.getFields());
+        t.setFilters(request.getFilters());
+        t.setLastFilter(request.getLastFilter());
 
         t = paraClient.create(t);
 
@@ -94,6 +98,7 @@ public class TableResource {
     }
 
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table/{table}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(
             @PathVariable("project") String project,
@@ -113,6 +118,7 @@ public class TableResource {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table", method = RequestMethod.GET)
     public ResponseEntity<PageResult<Table>> filter(
             @PathVariable("project") String project,
@@ -146,6 +152,7 @@ public class TableResource {
         return ResponseEntity.ok().body(pageResult);
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table/{table}", method = RequestMethod.GET)
     public ResponseEntity<Table> get(@PathVariable("project") String project,
                                       @PathVariable("table") String table) throws IOException {

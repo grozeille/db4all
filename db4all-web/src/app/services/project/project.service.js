@@ -30,12 +30,28 @@ function projectService($log, $http, $location, $filter, $q, $rootScope) {
     if(project.id) {
       var putUrl = vm.apiHost + '/project/' + project.id;
 
-      return $http.put(putUrl, project).catch(vm.catchServiceException);
+      return $http
+        .put(putUrl, project)
+        .then(function(request) {
+          return $http.get(putUrl);
+        })
+        .catch(vm.catchServiceException);
     }
     else {
       var postUrl = vm.apiHost + '/project';
 
-      return $http.post(postUrl, project).catch(vm.catchServiceException);
+      // create the initial project, then save all fields, then get the result
+      return $http
+        .post(postUrl, project)
+        .then(function(request) {
+          var location = request.headers().location;
+          return $http
+            .put(location, project)
+            .then(function(request) {
+              return $http.get(location);
+            });
+        })
+        .catch(vm.catchServiceException);
     }
   }
 

@@ -1,13 +1,9 @@
 package fr.grozeille.db4all2.table.web;
 
 import com.erudika.para.client.ParaClient;
-import com.erudika.para.core.ParaObject;
-import com.erudika.para.utils.Pager;
 import fr.grozeille.db4all2.project.model.Project;
 import fr.grozeille.db4all2.table.model.Table;
 import fr.grozeille.db4all2.table.model.TableData;
-import fr.grozeille.db4all2.table.web.dto.TableCreationRequest;
-import fr.grozeille.db4all2.table.web.dto.TableUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,10 +22,11 @@ import java.util.Map;
 @RequestMapping("/api/project")
 public class TableDataResource {
 
+    public static final String TABLE_DATA_ID_SUFFIX = "-data";
     @Autowired
     private ParaClient paraClient;
 
-
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table/{table}/data", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateData(
             @PathVariable("project") String project,
@@ -46,10 +42,10 @@ public class TableDataResource {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        TableData data = paraClient.read(new TableData().getType(), t.getId()+"#data");
+        TableData data = paraClient.read(new TableData().getType(), t.getId()+ TABLE_DATA_ID_SUFFIX);
         if(data == null) {
             data = new TableData();
-            data.setId(t.getId()+"#data");
+            data.setId(t.getId()+ TABLE_DATA_ID_SUFFIX);
             data.setParentid(t.getId());
             data.setVersion(1l);
             data.setTimestamp(System.currentTimeMillis());
@@ -61,7 +57,7 @@ public class TableDataResource {
         }
 
         data.setData(Arrays.asList(tableData));
-        paraClient.create(data);
+        data = paraClient.create(data);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/project/{project}/table/{table}/data")
@@ -70,6 +66,7 @@ public class TableDataResource {
         return ResponseEntity.created(location).build();
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/{project}/table/{table}/data", method = RequestMethod.GET)
     public ResponseEntity<List<Map<String, Object>>> getData(@PathVariable("project") String project,
                                                              @PathVariable("table") String table) throws Exception {
@@ -82,7 +79,7 @@ public class TableDataResource {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        TableData data = paraClient.read(new TableData().getType(), t.getId()+"#data");
+        TableData data = paraClient.read(new TableData().getType(), t.getId()+ TABLE_DATA_ID_SUFFIX);
         if(data == null) {
             data = new TableData();
             data.setData(new ArrayList<>());
