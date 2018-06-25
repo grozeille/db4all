@@ -6,6 +6,7 @@ import fr.grozeille.db4all2.project.model.Project;
 import fr.grozeille.db4all2.project.web.dto.ProjectCreationRequest;
 import fr.grozeille.db4all2.project.web.dto.ProjectUpdateRequest;
 import fr.grozeille.db4all2.table.model.Table;
+import fr.grozeille.db4all2.table.model.TableData;
 import fr.grozeille.db4all2.utils.PageResult;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -19,10 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -117,6 +115,20 @@ public class ProjectResource {
         if (p == null) {
             return ResponseEntity.notFound().build();
         }
+
+        // delete the associated data
+        Pager pager = new Pager(1, 100);
+        List<String> tablesToDelete = new ArrayList<>();
+        List<Table> tables;
+        do {
+            tables = paraClient.getChildren(p, new Table().getType(), pager);
+            for(Table t : tables) {
+                tablesToDelete.add(t.getId());
+                paraClient.deleteChildren(t, new TableData().getType());
+            }
+
+        }while(!tables.isEmpty());
+        paraClient.deleteAll(tablesToDelete);
 
         paraClient.delete(p);
 

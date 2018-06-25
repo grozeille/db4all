@@ -6,6 +6,7 @@ import com.erudika.para.utils.Pager;
 import fr.grozeille.db4all2.ClusterConfiguration;
 import fr.grozeille.db4all2.project.model.Project;
 import fr.grozeille.db4all2.table.model.Table;
+import fr.grozeille.db4all2.table.model.TableData;
 import fr.grozeille.db4all2.table.web.dto.TableCreationRequest;
 import fr.grozeille.db4all2.table.web.dto.TableUpdateRequest;
 import fr.grozeille.db4all2.utils.PageResult;
@@ -113,7 +114,12 @@ public class TableResource {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
+        // delete the associated data
+        paraClient.deleteChildren(t, new TableData().getType());
+
+        // delete the table
         paraClient.delete(t);
+
 
         return ResponseEntity.ok().build();
     }

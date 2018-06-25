@@ -52,6 +52,7 @@ function ProjectDetailController($log, $uibModal, $stateParams, $transitions, pr
         vm.projectId = request.data.id;
         vm.project = request.data;
         vm.alerts.push({msg: 'Project saved.', type: 'info'});
+        vm.form.$setPristine();
       })
       .catch(function(error) {
         if(vm.projectId) {
