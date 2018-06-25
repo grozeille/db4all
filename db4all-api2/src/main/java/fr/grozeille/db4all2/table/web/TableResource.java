@@ -8,6 +8,7 @@ import fr.grozeille.db4all2.project.model.Project;
 import fr.grozeille.db4all2.table.model.Table;
 import fr.grozeille.db4all2.table.web.dto.TableCreationRequest;
 import fr.grozeille.db4all2.table.web.dto.TableUpdateRequest;
+import fr.grozeille.db4all2.utils.PageResult;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class TableResource {
         Table t = new Table();
         t.setParentid(p.getId());
         t.setTimestamp(System.currentTimeMillis());
+        t.setUpdated(t.getTimestamp());
         t.setVersion(1l);
         t.setName(request.getName());
         t = paraClient.create(t);
@@ -75,7 +77,7 @@ public class TableResource {
 
         t.setId(table);
         t.setParentid(p.getId());
-        t.setTimestamp(System.currentTimeMillis());
+        t.setUpdated(System.currentTimeMillis());
         t.setVersion(t.getVersion()+1l);
         t.setName(request.getName());
         t.setComment(request.getComment());
@@ -112,20 +114,36 @@ public class TableResource {
     }
 
     @RequestMapping(value = "/{project}/table", method = RequestMethod.GET)
-    public ResponseEntity<List<Table>> filter(
+    public ResponseEntity<PageResult<Table>> filter(
             @PathVariable("project") String project,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "size", required = false, defaultValue = "100") Integer size,
-            @RequestParam(value = "filter", required = false, defaultValue = "") String filter) throws IOException {
+            @RequestParam(value = "filter", required = false, defaultValue = "*") String filter) throws IOException {
 
         Project p = getProject(project);
         if (p == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
+            PageResult pageResult = new PageResult();
+            pageResult.setFirst(true);
+            pageResult.setLast(true);
+            pageResult.setTotalElements(0l);
+            pageResult.setTotalPages(0);
+            pageResult.setContent(new ArrayList<>());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pageResult);
         }
 
         Pager pager = new Pager(page, size);
         List<Table> result = paraClient.findChildren(p, new Table().getType(), filter, pager);
-        return ResponseEntity.ok().body(result);
+
+        PageResult pageResult = new PageResult();
+        pageResult.setContent(result);
+        pageResult.setTotalElements(pager.getCount());
+
+        Integer totalPages = (int)Math.ceil(pager.getCount() / new Double(size));
+        pageResult.setTotalPages(totalPages);
+        pageResult.setFirst(page == 0);
+        pageResult.setLast(totalPages.equals(page + 1));
+
+        return ResponseEntity.ok().body(pageResult);
     }
 
     @RequestMapping(value = "/{project}/table/{table}", method = RequestMethod.GET)

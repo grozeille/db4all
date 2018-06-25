@@ -12,4 +12,10 @@ public class Table extends Sysprop {
 
     @Stored
     private TableField[] fields;
+
+    @Stored
+    private TableFilter[] filters;
+
+    @Stored
+    private TableFilterGroup lastFilter;
 }

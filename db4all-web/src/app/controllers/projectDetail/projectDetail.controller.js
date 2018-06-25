@@ -27,6 +27,9 @@ function ProjectDetailController($log, $uibModal, $stateParams, $transitions, pr
         .then(function(data) {
           vm.project = data;
           vm.tags = [];
+          if(vm.project.tags === null) {
+            vm.project.tags = [];
+          }
           for(var cpt = 0; cpt < vm.project.tags.length; cpt++) {
             vm.tags.push({text: vm.project.tags[cpt]});
           }

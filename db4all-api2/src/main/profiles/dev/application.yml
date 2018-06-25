@@ -1,5 +1,5 @@
 server:
-  port: 9800
+  port: 9900
 
 logging.level.org.hibernate.SQL: debug
 logging.level.org.apache.hadoop.yarn.util.RackResolver: warn
@@ -14,11 +14,11 @@ spring:
       max-request-size: 550Mb
 
 db4all:
-  adminToken:
+  adminToken: test
   para:
-    accessKey:
-    secretKey:
-    url:
+    accessKey: app:db4all
+    secretKey: cEp5NGGLIPDoQkm7EezPGGe5DOtezMjUQKNjSoS8ch8mubxx/kUM+g==
+    url: http://localhost:9090
 
 
 security:
