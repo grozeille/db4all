@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -23,6 +20,8 @@ import java.util.Map;
 public class TableDataResource {
 
     public static final String TABLE_DATA_ID_SUFFIX = "-data";
+    public static final String COL_ROW_ID = "#row_id#";
+
     @Autowired
     private ParaClient paraClient;
 
@@ -57,6 +56,16 @@ public class TableDataResource {
         }
 
         data.setData(Arrays.asList(tableData));
+
+        // add an unique Row ID if not already set
+        for(Map<String, Object> row : data.getData()) {
+            if(!row.isEmpty()) {
+                Object rowIdValue = row.get(COL_ROW_ID);
+                if (rowIdValue == null) {
+                    row.put(COL_ROW_ID, UUID.randomUUID().toString());
+                }
+            }
+        }
         data = paraClient.create(data);
 
         URI location = ServletUriComponentsBuilder
