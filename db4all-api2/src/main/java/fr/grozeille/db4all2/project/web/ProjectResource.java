@@ -8,8 +8,7 @@ import fr.grozeille.db4all2.project.web.dto.ProjectUpdateRequest;
 import fr.grozeille.db4all2.table.model.Table;
 import fr.grozeille.db4all2.table.model.TableData;
 import fr.grozeille.db4all2.utils.PageResult;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +31,7 @@ public class ProjectResource {
     private ParaClient paraClient;
 
     @CrossOrigin
+    @ApiOperation(value = "search projects", notes = "Search projects by filter on name/comment/tags")
     @RequestMapping(value = "", method = RequestMethod.GET)
     public PageResult<Project> filter(
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -54,6 +54,7 @@ public class ProjectResource {
     }
 
     @CrossOrigin
+    @ApiOperation(value = "get project", notes = "Get project details")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Project> get(@PathVariable("id") String id) {
         Project p = getProject(id);
@@ -65,6 +66,7 @@ public class ProjectResource {
     }
 
     @CrossOrigin
+    @ApiOperation(value = "create project", notes = "Create new project and get the ID")
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> create(@RequestBody ProjectCreationRequest request) throws Exception {
@@ -82,6 +84,7 @@ public class ProjectResource {
     }
 
     @CrossOrigin
+    @ApiOperation(value = "update project", notes = "Update information about the project")
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Void> update(
             @PathVariable("id") String id,
@@ -109,6 +112,7 @@ public class ProjectResource {
     }
 
     @CrossOrigin
+    @ApiOperation(value = "delete project", notes = "Delete the project, and all its tables and data")
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         Project p = getProject(id);
