@@ -14,11 +14,12 @@ spring:
       max-request-size: 550Mb
 
 db4all:
-  adminToken: e5e68d89adc641b2946b6c770c4fd7c7e23f278e
-  solr:
-    zkUrl: solrcloud:9983
-  hbase:
-    zkUrl: hbase:2181
+  adminToken: test
+  para:
+    accessKey: app:db4all
+    secretKey: cEp5NGGLIPDoQkm7EezPGGe5DOtezMjUQKNjSoS8ch8mubxx/kUM+g==
+    url: http://para:9090
+
 
 
 security:

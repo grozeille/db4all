@@ -8,19 +8,22 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export JAVA_HOME="${JAVA_HOME:-/usr}"
 
 # update log4j to use GELF if provided
-/update-gelf-logback.sh /tmp/logback.xml /db4all/logback.xml
+#/update-gelf-logback.sh /tmp/logback.xml /db4all/logback.xml
 
 
-export SOLR_URL=http://solrcloud:8983/solr
+export PARA_URL=http://para:8080/
 
 # wait for solr
-until $(curl --output /dev/null --silent --head --fail $SOLR_URL); do
+echo "Wait for para"
+until $(curl --output /dev/null --silent --head --fail $PARA_URL); do
   printf '.'
   sleep 5
 done
 
 
-echo "Creating Project collection"
+echo "Check if "
+
+echo "Creating Para application"
 # solr zk upconfig -z localhost:9983 -n project -d /solr-conf/project
 (cd /solr-conf/project/conf && zip -r - *) > project.zip
 curl -X POST --header "Content-Type:application/octet-stream" --data-binary @project.zip "$SOLR_URL/admin/configs?action=UPLOAD&name=project"
