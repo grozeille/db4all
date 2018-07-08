@@ -45,6 +45,8 @@
         <module>db4all-api</module>
         <module>db4all-docker</module>
         <module>db4all-api2</module>
+        <module>db4all-para</module>
+        <module>db4all-para-docker</module>
     </modules>
 
     <build>
