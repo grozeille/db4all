@@ -14,6 +14,7 @@ module.exports = {
     'brace-style': 1,
     'no-lonely-if': 1,
     'no-else-return': 1,
-    'guard-for-in': 1
+    'guard-for-in': 1,
+    'linebreak-style': 0
   }
 }

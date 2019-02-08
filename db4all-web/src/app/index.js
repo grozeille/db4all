@@ -11,7 +11,7 @@ require('ng-file-upload');
 require('ng-tags-input/build/ng-tags-input.min');
 require('ng-tags-input/build/ng-tags-input.min.css');
 require('ng-tags-input/build/ng-tags-input.bootstrap.min.css');
-require('angular-ui-router');
+require('@uirouter/angularjs');
 require('angular-ui-router-uib-modal');
 require('angular-sanitize');
 require('font-awesome-loader');

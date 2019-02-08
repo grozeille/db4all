@@ -3,7 +3,7 @@ var angular = require('angular');
 
 var datalakeToolboxModule = require('./app');
 
-require('angular-ui-router');
+require('@uirouter/angularjs');
 
 var routesConfig = require('./routes');
 
